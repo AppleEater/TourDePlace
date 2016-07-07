@@ -7,12 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.uaharoni.tourdeplace.helper.PlacesDB;
 import com.example.uaharoni.tourdeplace.model.Address;
 import com.example.uaharoni.tourdeplace.model.Place;
 
 import java.util.ArrayList;
 
-public class SearchResultsTBL extends PlacesDB{
+public class SearchResultsTBL extends PlacesDB {
 
     public SearchResultsTBL(Context context) {
         super(context);

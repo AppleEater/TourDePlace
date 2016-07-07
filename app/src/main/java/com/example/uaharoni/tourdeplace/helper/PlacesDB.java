@@ -1,4 +1,4 @@
-package com.example.uaharoni.tourdeplace.controller;
+package com.example.uaharoni.tourdeplace.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,12 +21,12 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
     public static final String TBL_NAME_SEARCH = "last_search";
     public static final String TBL_NAME_FAVORITES = "favorites";
 
-    String TEXT_TYPE = " TEXT";
-    String INTEGER_TYPE = " INTEGER";
-    String REAL_TYPE = " REAL";
-    String DATETIME_TYPE = " DATETIME";
-    String COL_NULLABLE = null;
-    String PRIMARY_KEY = " PRIMARY KEY AUTOINCREMENT";
+    public final String TEXT_TYPE = " TEXT";
+    public final String INTEGER_TYPE = " INTEGER";
+    public final String REAL_TYPE = " REAL";
+    public final String DATETIME_TYPE = " DATETIME";
+    public final String COL_NULLABLE = null;
+    public final String PRIMARY_KEY = " PRIMARY KEY AUTOINCREMENT";
 
     public static final String COL_ID = BaseColumns._ID;
     public static final String COL_NAME = "name";
