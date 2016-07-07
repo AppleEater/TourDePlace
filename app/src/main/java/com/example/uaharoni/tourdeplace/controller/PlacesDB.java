@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.CancellationSignal;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.uaharoni.tourdeplace.model.Place;
@@ -56,7 +58,7 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
             Log.e("deleteTBL-PlaceDB", "Failed to delete table " + tblName + ". " + e.getMessage());
         }
     }
-    protected Place getPlaceById(long rowid, String tblName) {
+    protected Place getPlaceById( long rowid, @NonNull String tblName) {
         Place place = null;
         String[] projection = {}; // null on purpose, to include all fields
         String selection = tblName + "." + COL_ID + " = ?";
@@ -66,7 +68,7 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
         Log.d("getPlaceById-PlacesDB", "Opening table " + tblName + " to read row " + String.valueOf(rowid));
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor singleRow = db.query(tblName, projection, selection, selectionArgs, null, null, sortOrder);
+            Cursor singleRow = db.query(tblName, projection, selection, selectionArgs, null, null,  sortOrder);
             if (singleRow.getCount() > 0) {
                 place = parseCursorRow(singleRow);
             } else {
@@ -79,7 +81,7 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
 
         return place;
     }
-    protected long insertPlace(Place place, String tblName){
+    protected long insertPlace(@NonNull Place place, @NonNull String tblName){
         long rowid=0;
         Log.d("insertPlace-PlacesDB","Inserting Place " + place.getName() + " to table " + tblName);
         ContentValues updatedValues = extractPlace(place);
@@ -92,7 +94,7 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
         }
         return  rowid;
     }
-    protected int deletePlace(Place place, String tblName){
+    protected int deletePlace(@NonNull Place place, @NonNull String tblName){
         int linesReturned = 0;
         long rowid = place.getId();
         Log.d("deletePlace","Delete place " + place.getName() + " (" + rowid + ") from table " + tblName);
@@ -111,7 +113,7 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
         }
         return linesReturned;
     }
-    protected ArrayList<Place> getAllPlaces(String tblName, String columnSorting){
+    protected ArrayList<Place> getAllPlaces(@NonNull String tblName, @Nullable String columnSorting){
         ArrayList<Place> placesList = new ArrayList<>();
         Log.d("getPlacesArray-PlacesDB","Fetching data from " + tblName);
         String[] columnsList = getSelectedColums();
