@@ -1,7 +1,9 @@
-package com.example.uaharoni.tourdeplace;
+package com.example.uaharoni.tourdeplace.view;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.uaharoni.tourdeplace.R;
 
 public class MainActivity extends AppCompatActivity {
 
