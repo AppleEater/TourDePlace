@@ -5,17 +5,17 @@
     <string name="tab_search">תוצאות אחרונות</string>
     <string name="tab_favorites">מקומות שמורים</string>
     <string name="tab_map">תצוגת מפה</string>
-    <string name="snackBar_message_no_location_permissions">לא ניתנו הרשאות זיהוי מיקום. לא ניתן לקבוע מיקום</string>
     <string name="marker_current_location">מיקומך</string>
     <string name="unit_system_km">קֿ\"מ</string>
     <string name="unit_system_miles">מייל</string>
-    <string name="snackbar_location_permissions_needed">יש לאשר הרשאות מיקום על מנת להראות מקומות סביבך</string>
     <string name="snackbar_action_ok">אשר</string>
-    <string name="action_power_connected">המכשיר מחובר למטען</string>
-    <string name="action_power_disconnected">המכשיר מנותק מהמטען</string>
     <string name="metric_system">ק״מ</string>
     <string name="british_system">מיילים</string>
     <string name="distance_system_title">הצג מררחק ב</string>
     <string name="action_search_title">חפש סביבי</string>
     <string name="search_hint">חדר כושר/ארומה/מסעדה</string>
+    <string name="snackbar_message_power_connected">המכשיר מחובר למטען</string>
+    <string name="snackbar_message_power_disconnected">המכשיר מנותק מהמטען</string>
+    <string name="snackbar_message_no_location_permissions">לא ניתנו הרשאות זיהוי מיקום. לא ניתן לקבוע מיקום</string>
+    <string name="snackbar_message_location_permissions_needed">יש לאשר הרשאות מיקום על מנת להראות מקומות סביבך</string>
 </resources>

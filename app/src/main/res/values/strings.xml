@@ -12,8 +12,8 @@
     <string name="snackbar_message_no_location_permissions">No location permission granted</string>
     <string name="snackbar_message_location_permissions_needed">Location access is required to show places nearby</string>
     <string name="snackbar_action_ok">OK</string>
-    <string name="snackbar_message_action_power_connected">Power is connected</string>
-    <string name="snackbar_message_action_power_disconnected">Power is disconnected</string>
+    <string name="snackbar_message_power_connected">Power is connected</string>
+    <string name="snackbar_message_power_disconnected">Power is disconnected</string>
     <!-- Map strings -->
     <string name="marker_current_location">Current Location</string>
 
@@ -36,4 +36,5 @@
     <!-- SearchView strings -->
     <string name="action_search_title">Search Around</string>
     <string name="search_hint">Starbucks/Restaurant/Gym</string>
+    <string name="distance_system_title">Distance units</string>
 </resources>
