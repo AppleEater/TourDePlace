@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">TourDePlace</string>
+    <!-- Menu String -->
+    <string name="action_settings">Settings</string>
+
+    <!-- Tab Strings -->
+    <string name="tab_search">Last results</string>
+    <string name="tab_favorites">Favorites</string>
+    <string name="tab_map">Map View</string>
+
+    <!-- Snackbar strings -->
+    <string name="snackbar_message_no_location_permissions">No location permission granted</string>
+    <string name="snackbar_message_location_permissions_needed">Location access is required to show places nearby</string>
+    <string name="snackbar_action_ok">OK</string>
+    <string name="snackbar_message_action_power_connected">Power is connected</string>
+    <string name="snackbar_message_action_power_disconnected">Power is disconnected</string>
+    <!-- Map strings -->
+    <string name="marker_current_location">Current Location</string>
+
+    <!-- Settings strings -->
+    <string name="distance_system" translatable="false">Distance units</string>
+    <string name="unit_system_km">KM</string>
+    <string name="unit_system_miles">Miles</string>
+    <string name="metric_system">Metric</string>
+    <string name="british_system">British</string>
+
+    <string-array name="metric_system">
+        <item>@string/metric_system</item>
+        <item>@string/british_system</item>
+    </string-array>
+    <string-array name="metric_system_values">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- SearchView strings -->
+    <string name="action_search_title">Search Around</string>
+    <string name="search_hint">Starbucks/Restaurant/Gym</string>
 </resources>
