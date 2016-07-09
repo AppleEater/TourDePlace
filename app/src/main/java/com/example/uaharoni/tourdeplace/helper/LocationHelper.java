@@ -36,8 +36,6 @@ public class LocationHelper {
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         context.startActivity(myIntent);
-                        //TODO: check why the dialog is not dismissed when clicking positiveButton
-
                     }
                 })
                 .setNegativeButton(context.getString(R.string.alert_dialog_negative), new DialogInterface.OnClickListener() {
