@@ -22,6 +22,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 
 import com.example.uaharoni.tourdeplace.R;
@@ -193,8 +194,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private void initToolBar(){
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
     @Override
     public void onLocationChanged(Location location) {
        //TODO: MapFragment.setCurrentLocation(lastLocation);
