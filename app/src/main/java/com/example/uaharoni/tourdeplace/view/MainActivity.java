@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
@@ -28,6 +29,8 @@ import com.example.uaharoni.tourdeplace.helper.LocationHelper;
 import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
+
+    private Toolbar toolbar;
 
     private SharedPreferences sharedPreferences;
     private BroadcastReceiver snackBarMessageReceiver;
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         locationHelper = new LocationHelper(this,locationManager);
 
         initReceivers();
+        initToolBar();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // This method always return true on API<23
@@ -185,6 +189,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
         }
+    }
+    private void initToolBar(){
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
     }
     @Override
     public void onLocationChanged(Location location) {
