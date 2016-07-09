@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 .registerReceiver(snackBarMessageReceiver, new IntentFilter("EVENT_SNACKBAR"));
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            lastKnownLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
-            Log.d("onResume","Fetch lastKnownLocation");
+            Log.d("onResume","Get lastKnownLocation from PassiveProvider");
+            lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
         }
 
             if(lastKnownLocation == null){
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     public void getLocationByPriority(@NonNull LocationProvider locationProvider){
         // Checking for permissions
             if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                Log.d("getLocByPrio","Permissions exist for provider " + locationProvider.getName());
+               Log.d("getLocByPrio","Permissions exist for provider " + locationProvider.getName());
                // lastKnownLocation = locationManager.getLastKnownLocation(locationProvider.getName());
                 locationManager.requestLocationUpdates(locationProvider.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
             }
@@ -173,7 +173,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         switch (requestCode) {
             case LOCATION_REQUEST_CODE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("RequestPerms", "Permission granted. Running initLocation");
+                    Log.d("RequestPerms", "Permission granted. Running initLocation with getLocationByPriority(Passive)");
+                    initLocation();
                     getLocationByPriority(locProvPassive);
                 } else {
                     Log.d("RequestPerms", "Location Permissions denied");
