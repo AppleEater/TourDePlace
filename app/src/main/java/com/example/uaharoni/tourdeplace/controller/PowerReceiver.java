@@ -30,7 +30,7 @@ public class PowerReceiver extends BroadcastReceiver{
         // Toast.makeText(context, localMessage, Toast.LENGTH_LONG).show();
         doSendBroadcast(localMessage);
     }
-    private void doSendBroadcast(String message) {
+    public void doSendBroadcast(String message) {
         Intent intentSnack = new Intent("EVENT_SNACKBAR");
 
         if (message != null)

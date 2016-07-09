@@ -37,4 +37,13 @@
     <string name="action_search_title">Search Around</string>
     <string name="search_hint">Starbucks/Restaurant/Gym</string>
     <string name="distance_system_title">Distance units</string>
+
+
+    <!-- AlertDisalog string -->
+    <string name="alert_dialog_title">Enable Location</string>
+    <string name="alert_dialog_text">Your Locations Settings is set to OFF.\nPlease Enable Location to use this app</string>
+    <string name="alert_dialog_positive">Location Settings</string>
+    <string name="alert_dialog_negative">Cancel</string>
+
+
 </resources>

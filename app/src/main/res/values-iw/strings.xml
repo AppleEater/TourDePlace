@@ -18,4 +18,8 @@
     <string name="snackbar_message_power_disconnected">המכשיר מנותק מהמטען</string>
     <string name="snackbar_message_no_location_permissions">לא ניתנו הרשאות זיהוי מיקום. לא ניתן לקבוע מיקום</string>
     <string name="snackbar_message_location_permissions_needed">יש לאשר הרשאות מיקום על מנת להראות מקומות סביבך</string>
+    <string name="alert_dialog_negative">בטל</string>
+    <string name="alert_dialog_positive">הגדרות מיקום</string>
+    <string name="alert_dialog_title">אפשר קבלת מיקום</string>
+    <string name="alert_dialog_text">הגדרות המיקום כבויות. יש להפעיל אותן על מנת להשתמש באפליקציה</string>
 </resources>
