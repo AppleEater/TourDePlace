@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationHelper = new LocationHelper(this,locationManager);
+        int orientation = getResources().getConfiguration().orientation;
+        int screenSize = getResources().getConfiguration().screenWidthDp;
+        Log.d("omCreate","Running on screen resolution: " + screenSize + ", orientation: " + orientation);
 
         initReceivers();
         initToolBar();

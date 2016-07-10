@@ -24,10 +24,17 @@
       android:layout_height="wrap_content"
       android:minHeight="?attr/actionBarSize"
       android:id="@+id/toolbar"
-      app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+      app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+      app:layout_scrollFlags="scroll|enterAlways">
   </android.support.v7.widget.Toolbar>
 
 </android.support.design.widget.AppBarLayout>
     <!-- Layout for content is here. This can be a RelativeLayout  -->
+    <FrameLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        />
 
     </android.support.design.widget.CoordinatorLayout>
