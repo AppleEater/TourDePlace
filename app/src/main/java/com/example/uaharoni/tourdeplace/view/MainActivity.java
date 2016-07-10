@@ -16,22 +16,31 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity implements LocationListener{
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private Toolbar toolbar;
+    private TabLayout tabLayout;
+    //private ViewPager viewPager;
+
+
 
     private SharedPreferences sharedPreferences;
     private BroadcastReceiver snackBarMessageReceiver;
@@ -46,10 +55,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     public static final String KEY_PREF_LONG = "KEY_LNG";
 
     private LatLng lastLocation = null;
-    private final long MIN_TIME_ms = 10000l;
+    private final long MIN_TIME_ms = 10000L;
     private final float MIN_DISTANCE_m = 3f;
     private Location lastKnownLocation = null;
-
 
     public static final int LOCATION_REQUEST_CODE = 1;
 
@@ -68,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         initReceivers();
         initToolBar();
+        initTabs();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // This method always return true on API<23
@@ -198,11 +207,43 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
+    private void initTabs() {
+
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.setSelectedTabIndicatorHeight(10);
+
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        final PagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(viewPagerAdapter);
+    }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("onItemSelected","Selected Menu Option " + item.getTitle());
+        switch (item.getItemId()){
+            case R.id.action_settings:
+                break;
+            case R.id.action_search:
+                break;
+            case R.id.action_feedback:
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     @Override

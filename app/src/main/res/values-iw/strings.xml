@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">תור מקום</string>
     <string name="action_settings">הגדרות</string>
-    <string name="tab_search">תוצאות אחרונות</string>
+    <string name="tab_search">תוצאות חיפוש</string>
     <string name="tab_favorites">מקומות שמורים</string>
     <string name="tab_map">תצוגת מפה</string>
     <string name="marker_current_location">מיקומך</string>
@@ -22,4 +22,5 @@
     <string name="alert_dialog_positive">הגדרות מיקום</string>
     <string name="alert_dialog_title">אפשר קבלת מיקום</string>
     <string name="alert_dialog_text">הגדרות המיקום כבויות. יש להפעיל אותן על מנת להשתמש באפליקציה</string>
+    <string name="action_feedback">משוב</string>
 </resources>

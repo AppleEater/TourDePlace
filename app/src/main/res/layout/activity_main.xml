@@ -28,6 +28,23 @@
       app:layout_scrollFlags="scroll|enterAlways">
   </android.support.v7.widget.Toolbar>
 
+        <android.support.design.widget.TabLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tabs">
+        </android.support.design.widget.TabLayout>
+
+
+        <!-- The ViewPager will contain the actual tabs and the fragments -->
+        <android.support.v4.view.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/viewPager"
+            android:layout_below="@id/tabs"
+            android:gravity="center">
+        </android.support.v4.view.ViewPager>
+
+
 </android.support.design.widget.AppBarLayout>
     <!-- Layout for content is here. This can be a RelativeLayout  -->
     <FrameLayout
