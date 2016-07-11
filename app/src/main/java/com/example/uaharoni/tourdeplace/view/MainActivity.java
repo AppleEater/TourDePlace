@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
@@ -252,15 +253,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Log.d("onItemSelected","Selected Menu Option " + item.getTitle());
         switch (item.getItemId()){
             case R.id.action_settings:
+                //View settingsView = findViewById(R.id.settingsContainer);
+                //settingsView.setBackgroundColor(R.attr.colorPrimary);
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.settingsContainer, new SettingsFragment())
+                        .addToBackStack(getString(R.string.action_settings))
+                        .commit();
                 break;
             case R.id.action_search:
                 break;
             case R.id.action_feedback:
                 break;
             default:
-                return super.onOptionsItemSelected(item);
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

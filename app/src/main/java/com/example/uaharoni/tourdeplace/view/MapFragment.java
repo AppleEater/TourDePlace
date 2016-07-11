@@ -60,10 +60,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d("onCreateView-MapFrag", "Launching MapFragment");
-        // Inflate the layout for this fragment
-        View layoutView = inflater.inflate(R.layout.fragment_map, container, false);
-        SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        supportMapFragment.getMapAsync(this);
+        View layoutView = null;
+        try{
+            layoutView = inflater.inflate(R.layout.fragment_map, container, false);
+            SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+            supportMapFragment.getMapAsync(this);
+        } catch (Exception e){
+            Log.e("onCreateView","Error inflating map inner fragment. " + e.getMessage());
+        }
+
 
         return layoutView;
     }

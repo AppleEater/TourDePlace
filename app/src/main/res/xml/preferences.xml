@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <PreferenceScreen
+            android:title="Booleans"
+            android:summary="Choose the booleans"
+            android:icon="@mipmap/ic_launcher"
+            android:persistent="true"
+        >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="stam_check"
+            android:summary="Please select stam or not..."
+            android:title="Select stam check" />
 
-    <CheckBoxPreference
-        android:key="checkbox_preference"
-        android:title="Title"
-        android:summary="Summary text" />
+        <SwitchPreference
+            android:key="stam_switch"
+            android:summary="Please toggle the switch"
+            android:title="Select switch on/off" />
+    </PreferenceScreen>
 
 </PreferenceScreen>
