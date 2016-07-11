@@ -20,7 +20,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +27,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
@@ -53,6 +51,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public static final String KEY_SEARCH_RADIUS = "SEARCH_RADIUS";
     public static final String KEY_PREF_LAT = "KEY_LAT";
     public static final String KEY_PREF_LONG = "KEY_LNG";
+
+    public static final int UNIT_SYSTEM_METRIC = 0;
+    public static final int UNIT_SYSTEM_US = 1;
+    public static final int DEFAULT_RADIUS_M = 300;
 
     private LatLng lastLocation = null;
     private final long MIN_TIME_ms = 10000L;
@@ -132,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 if(intent != null) {
                     String message = intent.getStringExtra("MESSAGE");
                     Log.d("onReceive","Got message " + message);
-                    Snackbar.make(findViewById(R.id.main_container),message,Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(R.id.main_content),message,Snackbar.LENGTH_LONG).show();
                 }
             }
         };  // closing the receiver
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void getLocationPermissions(){
             if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
                 Log.d("getLocPermisns","Explain to the user why we need to get location");
-                Snackbar.make(findViewById(R.id.main_container),getString(R.string.snackbar_message_location_permissions_needed),Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_location_permissions_needed),Snackbar.LENGTH_INDEFINITE)
                         .setAction(getString(R.string.snackbar_action_ok), new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -209,18 +211,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
     private void initTabs() {
 
+        ViewPager viewPager = (ViewPager) findViewById(R.id.fragment_container);
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());;
+
+        Log.d("initTabs","Adding Fragments");
+        int mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
+        int searchFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_search));
+        int favFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_favorites));
+
+        Log.d("initTabs","Connecting the tabs to the Adapter");
+        viewPager.setAdapter(viewPagerAdapter);
+
+        Log.d("initTabs","Creating tabLayout");
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.setSelectedTabIndicatorHeight(10);
-
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabLayout.setupWithViewPager(viewPager);
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        final PagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(viewPagerAdapter);
+        Log.d("initTabs","Adding icons to the tab");
+        try{
+            tabLayout.getTabAt(mapFragId).setIcon(android.R.drawable.ic_dialog_map);
+            tabLayout.getTabAt(searchFragId).setIcon(android.R.drawable.ic_menu_directions);
+            tabLayout.getTabAt(favFragId).setIcon(android.R.drawable.ic_menu_myplaces);
+        } catch (Exception e){
+            Log.e("initTabs","Error adding icons. " + e.getMessage());
+        }
     }
-
-
 
 
     @Override
