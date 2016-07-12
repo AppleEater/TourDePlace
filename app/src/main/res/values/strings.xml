@@ -16,6 +16,8 @@
     <string name="snackbar_action_ok">OK</string>
     <string name="snackbar_message_power_connected">Power is connected</string>
     <string name="snackbar_message_power_disconnected">Power is disconnected</string>
+    <string name="snackbar_message_no_keyword">No keyword to search on</string>
+
 
     <!-- Map strings -->
     <string name="marker_current_location">Current Location</string>
@@ -108,10 +110,21 @@
         <item>@string/search_engine_factual_value</item>
     </string-array>
 
-    <!-- SearchView strings -->
-    <string name="search_hint">Starbucks/Restaurant/Gym</string>
-    <string name="distance_system_title">Distance units</string>
+    <string name="settings_last_location_latitude" translatable="false">KEY_LAT</string>
+    <string name="settings_last_location_longitude" translatable="false">KEY_LNG</string>
 
+    <string-array name="settings_last_location_entries">
+        <item>@string/settings_last_location_latitude</item>
+        <item>@string/settings_last_location_longitude</item>
+    </string-array>
+
+
+    <!-- Search ActionProvider strings -->
+    <string name="search_hint">Starbucks/Restaurant/Gym</string>
+    <!-- string name="distance_system_title">Distance units</string> -->
+
+    <!-- Share ActionProvider strings -->
+    <string name="action_share_title">Share Place(s)</string>
 
     <!-- AlertDisalog string -->
     <string name="alert_dialog_title">Enable Location</string>

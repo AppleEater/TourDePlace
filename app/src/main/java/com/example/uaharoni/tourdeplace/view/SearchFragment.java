@@ -1,16 +1,22 @@
 package com.example.uaharoni.tourdeplace.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.SearchResultsTBL;
+import com.example.uaharoni.tourdeplace.model.Place;
 
 
 /**
@@ -24,6 +30,7 @@ public class SearchFragment extends Fragment {
     private SearchResultsTBL searchDbHelper;
 
     private OnFragmentInteractionListener mListener;
+    private ShareActionProvider shareProvider;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -84,4 +91,33 @@ public class SearchFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.share_place,menu);
+        shareProvider = (ShareActionProvider)menu.findItem(R.id.action_share);
+        return;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_share:
+                doSharePlace((Place) item);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+    public void doSharePlace(Place place) {
+        // populate the share intent with data
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(getString(R.string.settings_last_location_latitude),place.getAddress().getAddLat());
+        intent.putExtra(getString(R.string.settings_last_location_longitude),place.getAddress().getAddLong());
+        intent.putExtra("PLACE_NAME",place.getName());
+        shareProvider.setShareIntent(intent);
+}
 }

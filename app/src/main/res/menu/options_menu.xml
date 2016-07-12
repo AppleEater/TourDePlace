@@ -12,6 +12,7 @@
         app:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.support.v7.widget.SearchView" />
 
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

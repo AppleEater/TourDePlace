@@ -22,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -33,7 +34,7 @@ import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity implements LocationListener, SearchView.OnQueryTextListener {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -81,15 +82,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         initToolBar();
         initTabs();
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // This method always return true on API<23
-            Log.d("onCreate-Main","Permissions are granted");
-            initLocation();
-            getLocationByPriority(locProvPassive);
-        } else {
-            Log.d("onCreate","No permissions, running on API>=23. Running getLocationPermissions");
-            getLocationPermissions();
-        }
+
 
 
         Log.d("onCreate-Main","Finished onCreate");
@@ -102,11 +95,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(snackBarMessageReceiver, new IntentFilter("EVENT_SNACKBAR"));
 
+        /*
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d("onResume","Get lastKnownLocation from PassiveProvider");
             lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
         }
-
+*/
             if(lastKnownLocation == null){
             Log.d("onResume-Main", "No lastLocation available. using saved info");
             double prefLat = Double.parseDouble(sharedPreferences.getString(KEY_PREF_LAT, "32.0640349"));
@@ -245,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
 
+        menu.findItem(R.id.action_search);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -259,14 +254,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         .replace(R.id.settingsContainer, new SettingsFragment())
                         .addToBackStack(getString(R.string.action_settings))
                         .commit();
-                break;
+                return true;
             case R.id.action_search:
-                break;
+                return true;
             case R.id.action_feedback:
-                break;
+                return true;
             default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -284,5 +281,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onProviderDisabled(String s) {
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        Log.d("onQuerySubmit","Query string: " + query);
+        if(query.isEmpty()) {
+            Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_no_keyword),Snackbar.LENGTH_SHORT).show();
+            return true;
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // This method always return true on API<23
+            Log.d("onCreate-Main","Permissions are granted");
+            initLocation();
+            getLocationByPriority(locProvPassive);
+        } else {
+            Log.d("onCreate","No permissions, running on API>=23. Running getLocationPermissions");
+            getLocationPermissions();
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("onResume","Get lastKnownLocation from PassiveProvider");
+            lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }
