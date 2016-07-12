@@ -52,7 +52,7 @@ public class PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnC
                 textDistance.concat(context.getString(R.string.unit_system_km));
                 break;
             case MainActivity.UNIT_SYSTEM_US:
-                textDistance.concat(context.getString(R.string.unit_system_miles));
+                textDistance.concat(context.getString(R.string.unit_system_mi));
                 break;
         }
         txtPlaceDistance.setText("" + textDistance);

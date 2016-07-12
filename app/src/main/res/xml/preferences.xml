@@ -1,23 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    >
-    <PreferenceScreen
-            android:title="Booleans"
-            android:summary="Choose the booleans"
-            android:icon="@mipmap/ic_launcher"
-            android:persistent="true"
-        >
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="stam_check"
-            android:summary="Please select stam or not..."
-            android:title="Select stam check" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/action_settings"
+    android:icon="@android:drawable/ic_menu_manage">
 
-        <SwitchPreference
-            android:key="stam_switch"
-            android:summary="Please toggle the switch"
-            android:title="Select switch on/off" />
+    <PreferenceCategory
+        android:title="@string/action_settings"
+        android:defaultValue="true">
+
+        <ListPreference
+            android:key="@string/settings_distance_units_key"
+            android:title="@string/settings_distance_units_title"
+            android:summary="%s"
+            android:persistent="true"
+            android:entries="@array/distance_units_entries"
+            android:entryValues="@array/distance_units_values"
+            android:defaultValue="@string/unit_system_km"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:dialogIcon="@android:drawable/ic_menu_set_as"
+            />
+
+        <ListPreference
+            android:key="@string/settings_searchRadius_key"
+            android:title="@string/settings_searchRadius_title"
+            android:summary="%s"
+            android:persistent="true"
+            android:entries="@array/settings_searchRadius_km_entries"
+            android:entryValues="@array/settings_searchRadius_values"
+            android:icon="@android:drawable/ic_menu_search"
+            android:defaultValue="@string/settings_searchRadius_value_500"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceScreen android:title="@string/settings_screen_developer_settings" android:icon="@android:drawable/ic_menu_manage"
+        android:summary="Options will be effective only after app restart"
+        android:enabled="false">
+
+
+            <SwitchPreference
+                android:key="@string/settings_key_search_engine"
+                android:summary="@string/settings_key_search_engine_summary"
+                android:title="@string/settings_search_engine_title" />
+
     </PreferenceScreen>
 
 </PreferenceScreen>

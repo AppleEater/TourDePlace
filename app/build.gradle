@@ -34,4 +34,5 @@ dependencies {
     compile 'com.android.support:support-annotations:24.0.0'
     compile 'com.google.android.gms:play-services-maps:9.2.0'
     compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.minimize.library:seekbar-compat:0.2.5'
 }

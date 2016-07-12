@@ -16,23 +16,96 @@
     <string name="snackbar_action_ok">OK</string>
     <string name="snackbar_message_power_connected">Power is connected</string>
     <string name="snackbar_message_power_disconnected">Power is disconnected</string>
+
     <!-- Map strings -->
     <string name="marker_current_location">Current Location</string>
 
     <!-- Settings strings -->
-    <string name="distance_system" translatable="false">Distance units</string>
-    <string name="unit_system_km">KM</string>
-    <string name="unit_system_miles">Miles</string>
-    <string name="metric_system">Metric</string>
-    <string name="british_system">British</string>
+    <string name="settings_category_search_settings_title">Search Settings</string>
+    <string name="settings_category_search_settings_summary">Change your search parameters</string>
 
-    <string-array name="metric_system">
+    <string name="settings_distance_units_key" translatable="false">DISTANCE_UNITS</string>
+    <string name="settings_distance_units_title">Display distance in</string>
+    <string name="metric_system">Kilometers</string>
+    <string name="british_system">Miles</string>
+    <string name="unit_system_km" translatable="false">KM</string>
+    <string name="unit_system_mi" translatable="false">MI</string>
+
+    <string-array name="distance_units_entries">
         <item>@string/metric_system</item>
         <item>@string/british_system</item>
     </string-array>
-    <string-array name="metric_system_values">
-        <item>1</item>
-        <item>2</item>
+    <string-array name="distance_units_values">
+        <item>@string/unit_system_km</item>
+        <item>@string/unit_system_mi</item>
+    </string-array>
+
+    <string name="settings_searchRadius_key" translatable="false">SEARCH_RADIUS</string>
+    <string name="settings_searchRadius_title">Search Radius</string>
+    <string name="settings_searchRadius_summary">Radius distance in KM</string>
+
+    <string name="settings_searchRadius_km_value_500">500 Meter</string>
+    <string name="settings_searchRadius_km_value_1000">1 Kilometer</string>
+    <string name="settings_searchRadius_km_value_1500">1.5 Kilometer</string>
+    <string name="settings_searchRadius_km_value_2000">2 Kilometer</string>
+    <string name="settings_searchRadius_km_value_5000">5 Kilometer</string>
+    <string name="settings_searchRadius_km_value_10000">10 Kilometer</string>
+
+    <string name="settings_searchRadius_value_500" translatable="false">0.5</string>
+    <string name="settings_searchRadius_value_1000" translatable="false">1</string>
+    <string name="settings_searchRadius_value_1500" translatable="false">1.5</string>
+    <string name="settings_searchRadius_value_2000" translatable="false">2</string>
+    <string name="settings_searchRadius_value_5000" translatable="false">5</string>
+    <string name="settings_searchRadius_value_10000" translatable="false">10</string>
+
+
+    <array name="settings_searchRadius_km_entries">
+        <item>@string/settings_searchRadius_km_value_500</item>
+        <item>@string/settings_searchRadius_km_value_1000</item>
+        <item>@string/settings_searchRadius_km_value_1500</item>
+        <item>@string/settings_searchRadius_km_value_2000</item>
+        <item>@string/settings_searchRadius_km_value_5000</item>
+        <item>@string/settings_searchRadius_km_value_10000</item>
+    </array>
+
+    <array name="settings_searchRadius_values">
+        <item>@string/settings_searchRadius_value_500</item>
+        <item>@string/settings_searchRadius_value_1000</item>
+        <item>@string/settings_searchRadius_value_1500</item>
+        <item>@string/settings_searchRadius_value_2000</item>
+        <item>@string/settings_searchRadius_value_5000</item>
+        <item>@string/settings_searchRadius_value_10000</item>
+    </array>
+
+    <string name="settings_searchRadius_mi_value_500">0.5 mile</string>
+    <string name="settings_searchRadius_mi_value_1000">1 mile</string>
+    <string name="settings_searchRadius_mi_value_1500">1.5 mile</string>
+    <string name="settings_searchRadius_mi_value_2000">2 mile</string>
+    <string name="settings_searchRadius_mi_value_5000">5 mile</string>
+    <string name="settings_searchRadius_mi_value_10000">10 mile</string>
+    <array name="settings_searchRadius_mi_entries">
+        <item>@string/settings_searchRadius_mi_value_500</item>
+        <item>@string/settings_searchRadius_mi_value_1000</item>
+        <item>@string/settings_searchRadius_mi_value_1500</item>
+        <item>@string/settings_searchRadius_mi_value_2000</item>
+        <item>@string/settings_searchRadius_mi_value_5000</item>
+        <item>@string/settings_searchRadius_mi_value_10000</item>
+    </array>
+    <string name="settings_screen_developer_settings">Developer Settings</string>
+    <string name="settings_search_engine_title">Search engine</string>
+    <string name="settings_key_search_engine" translatable="false">SEARCH_ENGINE</string>
+    <string name="settings_key_search_engine_summary">Selected Engine:</string>
+    <string name="search_engine_google" translatable="false">Google</string>
+    <string name="search_engine_factual" translatable="false">Factual</string>
+    <string-array name="search_engine_entries">
+        <item>@string/search_engine_google</item>
+        <item>@string/search_engine_factual</item>
+    </string-array>
+    <string name="search_engine_google_value" translatable="false">GOOG</string>
+    <string name="search_engine_factual_value" translatable="false">FACT</string>
+    <string-array name="search_engine_values">
+        <item>@string/search_engine_google_value</item>
+        <item>@string/search_engine_factual_value</item>
     </string-array>
 
     <!-- SearchView strings -->

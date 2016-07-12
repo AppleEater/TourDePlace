@@ -3,9 +3,11 @@ package com.example.uaharoni.tourdeplace.view;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,65 +32,53 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         //TODO: Test Preference Headers
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        // Add listeners for every object
+        getPreferenceManager().findPreference(getString(R.string.settings_distance_units_key)).setOnPreferenceChangeListener(this);
+        getPreferenceManager().findPreference(getString(R.string.settings_searchRadius_key)).setOnPreferenceChangeListener(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         if (view != null) {
-            //view.setBackgroundColor(getResources().getColor(android.R.color.white));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 view.setBackgroundColor(getResources().getColor(android.R.color.white,getActivity().getTheme()));
             } else {
                 view.setBackgroundColor(getResources().getColor(android.R.color.white));
             }
-
         }
-
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
-/*
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String keyPref) {
-        Preference preference = findPreference(keyPref);
-
-        if (preference instanceof ListPreference) {
-            ListPreference listPreference = (ListPreference) preference;
-            int prefIndex = listPreference.findIndexOfValue(sharedPreferences.getString(keyPref, ""));
-            if (prefIndex >= 0) {
-                preference.setSummary(listPreference.getEntries()[prefIndex]);
-            }
-        } else {
-            preference.setSummary(sharedPreferences.getString(keyPref, ""));
-
-        }
-    }
-*/
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        /*
-          if(preference.getKey().equals("edit_text")){
-            editTextPreference.setSummary("Your name is: " + newValue);
+        Log.d("onPrefsChange","Pref: " + preference.getKey() + " got value " + newValue.toString());
+
+        if(preference.getKey().equals(getString(R.string.settings_searchRadius_key))){
+            Log.d("onPrefsChange","Entry name: " + ((ListPreference)preference).getEntries()[((ListPreference)preference).findIndexOfValue(newValue.toString())] );
         }
-        else if(preference.getKey().equals("list1")){
-            preference.setSummary("You picked " + newValue);
+
+        if(preference.getKey().equals(getString(R.string.settings_distance_units_key))){
+            Log.d("onPrefsChange","New entry name: " + ((ListPreference)preference).getEntries()[((ListPreference)preference).findIndexOfValue(newValue.toString())]);
+            String[] newEntries=null;
+            if(newValue.toString().equals(getString(R.string.unit_system_mi))){
+                newEntries = getResources().getStringArray(R.array.settings_searchRadius_mi_entries);
+            } else if(newValue.toString().equals(getString(R.string.unit_system_km))){
+                newEntries = getResources().getStringArray(R.array.settings_searchRadius_km_entries);
+            }
+            Log.d("onPrefsChange","Modifying the entries list for the searchRadius");
+            ((ListPreference)getPreferenceManager().findPreference(getString(R.string.settings_searchRadius_key))).setEntries(newEntries);
+
+            }
+            return true;
         }
-         */
-        return true;
     }
-}

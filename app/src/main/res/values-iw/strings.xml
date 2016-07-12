@@ -6,8 +6,6 @@
     <string name="tab_favorites">מקומות שמורים</string>
     <string name="tab_map">תצוגת מפה</string>
     <string name="marker_current_location">מיקומך</string>
-    <string name="unit_system_km">קֿ\"מ</string>
-    <string name="unit_system_miles">מייל</string>
     <string name="snackbar_action_ok">אשר</string>
     <string name="metric_system">ק״מ</string>
     <string name="british_system">מיילים</string>
@@ -23,4 +21,25 @@
     <string name="alert_dialog_title">אפשר קבלת מיקום</string>
     <string name="alert_dialog_text">הגדרות המיקום כבויות. יש להפעיל אותן על מנת להשתמש באפליקציה</string>
     <string name="action_feedback">משוב</string>
+    <string name="hello_blank_fragment">שלום עולם</string>
+    <string name="settings_category_search_settings_summary">התאם את ברירות המחדל לחיפוש</string>
+    <string name="settings_category_search_settings_title">הגדרות חיפוש</string>
+    <string name="settings_key_search_engine_summary">מנוע חיפוש נבחר</string>
+    <string name="settings_screen_developer_settings">הגדרות מפתח</string>
+    <string name="settings_search_engine_title">מנוע חיפוש מקומות</string>
+    <string name="settings_searchRadius_summary">מרחק חיפוש בקמ</string>
+    <string name="settings_searchRadius_title">רדיוס חיפוש</string>
+    <string name="settings_distance_units_title">הצג מרחק ב:</string>
+    <string name="settings_searchRadius_km_value_10000">10 ק״מ</string>
+    <string name="settings_searchRadius_km_value_1500">1.5 ק״מ</string>
+    <string name="settings_searchRadius_km_value_2000">2 ק״מ</string>
+    <string name="settings_searchRadius_km_value_5000">5 ק״מ</string>
+    <string name="settings_searchRadius_mi_value_1000">1 מייל</string>
+    <string name="settings_searchRadius_mi_value_10000">10 מייל</string>
+    <string name="settings_searchRadius_mi_value_1500">1.5 מייל</string>
+    <string name="settings_searchRadius_mi_value_2000">2 מייל</string>
+    <string name="settings_searchRadius_mi_value_500">0.5 מייל</string>
+    <string name="settings_searchRadius_mi_value_5000">5 מייל</string>
+    <string name="settings_searchRadius_km_value_1000">1 ק״מ</string>
+    <string name="settings_searchRadius_km_value_500">500 מטר</string>
 </resources>
