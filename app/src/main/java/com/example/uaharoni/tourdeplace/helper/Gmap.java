@@ -29,24 +29,6 @@ public class Gmap {
     public final static String JSON_PLACE_NAME = "name";
     public final static String JSON_PLACE_ADDRESS_NAME = "vicinity";
 
-    private Uri buildUrl(Context context, LatLng location, int searchRadius, String term, String pagetoken) {
-        Uri.Builder urlBuilder = new Uri.Builder().scheme(Gmap.URL_PROTOCOL)
-                .authority(Gmap.AUTHORITY)
-                .appendPath("maps")
-                .appendPath("api")
-                .appendPath("place")
-                .appendPath("nearbysearch")
-                .appendPath("json")
-                .appendQueryParameter("language", Locale.getDefault().getLanguage())
-                .appendQueryParameter("pagetoken", (pagetoken == null) ? "" : pagetoken)
-                .appendQueryParameter("radius", String.valueOf(searchRadius))
-                .appendQueryParameter("location", String.valueOf(location.latitude) + "," + String.valueOf(location.longitude))
-                .appendQueryParameter("keyword", (term == null) ? "" : term)
-                .appendQueryParameter("key", context.getString(R.string.google_maps_key));
-
-        Log.i("buildUrl", "Loading URI:" + urlBuilder.build().toString());
-        return urlBuilder.build();
-    }
     private ArrayList<Place> getNearbyPlacesList(Context context, LatLng location, int searchRadius, String keyword) {
         ArrayList<Place> arrPlacesList = new ArrayList<>();
         URL searchPlacesUrl = null;

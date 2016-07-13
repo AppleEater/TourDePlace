@@ -32,6 +32,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.controller.SearchGplace;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
 import com.google.android.gms.maps.model.LatLng;
@@ -314,6 +315,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
         */
         // TODO: Launch search service
+        Intent serviceSearch = new Intent(this,SearchGplace.class);
+        serviceSearch.putExtra("KEYWORD",query.trim());
+        startService(serviceSearch);
         return true;
     }
 
