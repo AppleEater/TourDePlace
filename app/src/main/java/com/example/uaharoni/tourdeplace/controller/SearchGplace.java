@@ -1,8 +1,8 @@
 package com.example.uaharoni.tourdeplace.controller;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
@@ -107,7 +107,7 @@ public class SearchGplace extends IntentService {
         // TODO: Handle action Baz
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    private Uri buildUrl(Context context, LatLng location, int searchRadius, String term, String pagetoken) {
+    private Uri buildUrl(LatLng location, int searchRadius, String term) {
         Uri.Builder urlBuilder = new Uri.Builder().scheme(URL_PROTOCOL)
                 .authority(AUTHORITY)
                 .appendPath("maps")
@@ -116,11 +116,12 @@ public class SearchGplace extends IntentService {
                 .appendPath("nearbysearch")
                 .appendPath("json")
                 .appendQueryParameter("language", Locale.getDefault().getLanguage())
-                .appendQueryParameter("pagetoken", (pagetoken == null) ? "" : pagetoken)
                 .appendQueryParameter("radius", String.valueOf(searchRadius))
                 .appendQueryParameter("location", String.valueOf(location.latitude) + "," + String.valueOf(location.longitude))
                 .appendQueryParameter("keyword", (term == null) ? "" : term)
-                .appendQueryParameter("key", context.getString(R.string.google_maps_key));
+                .appendQueryParameter("key",getString(R.string.google_maps_key))
+//                .appendQueryParameter("pagetoken", (pagetoken == null) ? "" : pagetoken)
+                ;
 
         Log.i("buildUrl", "Loading URI:" + urlBuilder.build().toString());
         return urlBuilder.build();
