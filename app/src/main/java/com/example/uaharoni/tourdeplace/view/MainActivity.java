@@ -41,7 +41,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
+    ViewPager viewPager;
     private SearchView searchView;
+    int searchFragId;
 
 
 
@@ -52,8 +54,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public LocationProvider locProvLow,locProvHigh,locProvPassive;
 
 
-    public static final String KEY_UNIT_SYSTEM = "UNIT_SYSTEM";
-    public static final String KEY_SEARCH_RADIUS = "SEARCH_RADIUS";
+//    public static final String KEY_SEARCH_RADIUS = "SEARCH_RADIUS";
     public static final String KEY_PREF_LAT = "KEY_LAT";
     public static final String KEY_PREF_LONG = "KEY_LNG";
 
@@ -95,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void onResume() {
         super.onResume();
         Log.d("onResume-Main","onResume started.");
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(snackBarMessageReceiver, new IntentFilter("EVENT_SNACKBAR"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
 
         /*
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -126,16 +126,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     private void initReceivers(){
-        snackBarMessageReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if(intent != null) {
-                    String message = intent.getStringExtra("MESSAGE");
-                    Log.d("onReceive","Got message " + message);
-                    Snackbar.make(findViewById(R.id.main_content),message,Snackbar.LENGTH_LONG).show();
+        snackBarMessageReceiver = new LocalReceiver();
+    }
+    private class LocalReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent !=null){
+                if(intent.getAction() .equals((String)getString(R.string.power_receiver_custom_intent_action))){
+                    String message = intent.getStringExtra(getString(R.string.snackbar_message_custom_intent_extra_text));
+                    if(message != null){
+                        Log.d("onReceive","Got message " + message);
+                        Snackbar.make(findViewById(R.id.main_content),message,Snackbar.LENGTH_LONG).show();
+                    }
                 }
             }
-        };  // closing the receiver
+        }
     }
     public void initLocation(){
         // Get passive provider
@@ -209,12 +215,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
     private void initTabs() {
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.fragment_container);
+        viewPager = (ViewPager) findViewById(R.id.fragment_container);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());;
 
         Log.d("initTabs","Adding Fragments");
+        searchFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_search));
         int mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
-        int searchFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_search));
         int favFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_favorites));
 
         Log.d("initTabs","Connecting the tabs to the Adapter");
@@ -297,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public boolean onQueryTextSubmit(String query) {
         searchView.clearFocus();
         Log.d("onQuerySubmit","Query string: " + query);
+        viewPager.setCurrentItem(0);
 
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -314,9 +321,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
         }
         */
-        // TODO: Launch search service
         Intent serviceSearch = new Intent(this,SearchGplace.class);
-        serviceSearch.putExtra("KEYWORD",query.trim());
+        serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),query.trim());
         startService(serviceSearch);
         return true;
     }

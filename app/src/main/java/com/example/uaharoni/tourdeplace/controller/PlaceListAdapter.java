@@ -25,8 +25,7 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
     private SharedPreferences sharedPreferences;
     private Location currentLocation;
 
-    private int unitSystem;
-    private String searchRadius_unit;
+    private String unitSystem,searchRadius_unit;
 
     private Context context;
 
@@ -63,10 +62,10 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
         }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        unitSystem = sharedPreferences.getInt(MainActivity.KEY_UNIT_SYSTEM,MainActivity.UNIT_SYSTEM_METRIC);
-        Log.d("onCreateViewHolder",MainActivity.KEY_UNIT_SYSTEM + " = " + unitSystem);
-        searchRadius_unit = sharedPreferences.getString(MainActivity.KEY_SEARCH_RADIUS, String.valueOf(MainActivity.DEFAULT_RADIUS_M));
-        Log.d("onCreateViewHolder",MainActivity.KEY_SEARCH_RADIUS + " = " + searchRadius_unit );
+        unitSystem = sharedPreferences.getString(parent.getContext().getString(R.string.settings_distance_units_key),parent.getContext().getString(R.string.unit_system_km));
+        Log.d("onCreateViewHolder",parent.getContext().getString(R.string.settings_distance_units_key) + " = " + unitSystem);
+        searchRadius_unit = sharedPreferences.getString(parent.getContext().getString(R.string.settings_searchRadius_key), String.valueOf(MainActivity.DEFAULT_RADIUS_M));
+        Log.d("onCreateViewHolder",parent.getContext().getString(R.string.settings_searchRadius_key) + " = " + searchRadius_unit );
 
 
         return new PlaceViewHolder(itemView);

@@ -2,6 +2,7 @@ package com.example.uaharoni.tourdeplace.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.controller.SearchReceiver;
 import com.example.uaharoni.tourdeplace.controller.SearchResultsTBL;
 import com.example.uaharoni.tourdeplace.model.Place;
 
@@ -28,6 +30,7 @@ import com.example.uaharoni.tourdeplace.model.Place;
 public class SearchFragment extends Fragment {
 
     private SearchResultsTBL searchDbHelper;
+    private SearchReceiver searchReceiver;
 
     private OnFragmentInteractionListener mListener;
     private ShareActionProvider shareProvider;
@@ -42,15 +45,31 @@ public class SearchFragment extends Fragment {
         Log.d("onCreateView-SearchFrag","parsing bundle");
         searchDbHelper = new SearchResultsTBL(getContext());
         // Inflate the layout for this fragment
-        View searchView = inflater.inflate(R.layout.fragment_search, container, false);
+        View searchFragLayout = inflater.inflate(R.layout.fragment_search, container, false);
 
-    //    RecyclerView recyclerView = (RecyclerView) searchView.findViewById(R.id.rv_search);
-     //   PlaceListAdapter searchAdapter = new PlaceListAdapter(searchDbHelper.getAllPlaces(),R.id.rv_search,currentLocation);
+        /*
+        RecyclerView recyclerView = (RecyclerView) searchFragLayout.findViewById(R.id.rv_search);
+        PlaceListAdapter searchAdapter = new PlaceListAdapter(searchDbHelper.getAllPlaces(),R.id.rv_search,currentLocation);
 
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        recyclerView.setAdapter(searchAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(searchAdapter);
+        */
+        return searchFragLayout;
+    }
 
-        return searchView;
+    @Override
+    public void onResume() {
+        super.onResume();
+        searchReceiver = new SearchReceiver();
+        //LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchReceiver,new IntentFilter(getString(R.string.search_service_custom_intent_action)));
+        getContext().registerReceiver(searchReceiver,new IntentFilter(getString(R.string.search_service_custom_intent_action)));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchReceiver);
+        getContext().unregisterReceiver(searchReceiver);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -97,7 +116,6 @@ public class SearchFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.share_place,menu);
         shareProvider = (ShareActionProvider)menu.findItem(R.id.action_share);
-        return;
     }
 
     @Override

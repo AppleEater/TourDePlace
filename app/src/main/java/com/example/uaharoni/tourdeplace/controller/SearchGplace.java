@@ -7,27 +7,18 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.model.Place;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
 public class SearchGplace extends IntentService {
 
-    public static String AppLang = Locale.getDefault().getLanguage();
-    public final  static String URL_PROTOCOL = "https";
-    public final  static String AUTHORITY = "maps.googleapis.com";
-    public final static String JSON_RESPNOSE = "status";
-    public final static String JSON_RESPONSE_TYPE_TRUE = "OK";
-    public final static String JSON_SEARCH_ARRAY = "results";
-    public final static String JSON_PLACE_NAME = "name";
-    public final static String JSON_PLACE_ADDRESS_NAME = "vicinity";
+    private static final String TAG = "SearchGplace";
+    public static final int STATUS_RUNNING = 0;
+    public static final int STATUS_FINISHED = 1;
+    public static final int STATUS_ERROR = 2;
 
     //sample: https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=restaurant&name=cruise&key=YOUR_API_KEY
 
@@ -76,7 +67,18 @@ public class SearchGplace extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.d(TAG, "Service Started.");
         if (intent != null) {
+            final String searchTerm = intent.getStringExtra(getString(R.string.search_service_intent_query_extra));
+            updateServiceStatus(STATUS_RUNNING);
+            try{
+                getPlacesList(searchTerm);
+            } catch (Exception e){
+                Log.d(TAG,"Error in getPlaces. " + e.getMessage());
+                updateServiceStatus(STATUS_ERROR);
+            }
+
+            /*
             final String action = intent.getAction();
             if (ACTION_FOO.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_PARAM1);
@@ -87,7 +89,29 @@ public class SearchGplace extends IntentService {
                 final String param2 = intent.getStringExtra(EXTRA_PARAM2);
                 handleActionBaz(param1, param2);
             }
+            */
         }
+        Log.d(TAG,"Service Finished!"); // No need to call stopSelf()
+    }
+    private void updateServiceStatus(int status){
+        Log.d(TAG,"Creating Intent for Status " + status);
+        Intent localIntent = new Intent(getString(R.string.search_service_custom_intent_action));
+        localIntent.putExtra(getString(R.string.search_service_custom_intent_status),status);
+        Log.d(TAG,"Broadcasting the intent");
+        //LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+        sendBroadcast(localIntent);
+    }
+    protected void getPlacesList(String query){
+        int serviceStatus = STATUS_RUNNING;
+        ArrayList<Place> placeArrayList = new ArrayList<>();
+        //TODO: populate ArrayList with GooglePlaces list
+
+        SearchResultsTBL searchDbHelper = new SearchResultsTBL(this);
+        for (int i = 0; i < placeArrayList.size() ; i++) {
+            searchDbHelper.insertPlace(placeArrayList.get(i));
+        }
+        serviceStatus = STATUS_FINISHED;
+        updateServiceStatus(serviceStatus);
     }
 
     /**
@@ -107,9 +131,16 @@ public class SearchGplace extends IntentService {
         // TODO: Handle action Baz
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
     private Uri buildUrl(LatLng location, int searchRadius, String term) {
-        Uri.Builder urlBuilder = new Uri.Builder().scheme(URL_PROTOCOL)
-                .authority(AUTHORITY)
+        final String JSON_RESPNOSE = "status";
+        final String JSON_RESPONSE_TYPE_TRUE = "OK";
+        final String JSON_SEARCH_ARRAY = "results";
+        final String JSON_PLACE_NAME = "name";
+        final String JSON_PLACE_ADDRESS_NAME = "vicinity";
+
+        Uri.Builder urlBuilder = new Uri.Builder().scheme("https")
+                .authority("maps.googleapis.com")
                 .appendPath("maps")
                 .appendPath("api")
                 .appendPath("place")
@@ -119,7 +150,7 @@ public class SearchGplace extends IntentService {
                 .appendQueryParameter("radius", String.valueOf(searchRadius))
                 .appendQueryParameter("location", String.valueOf(location.latitude) + "," + String.valueOf(location.longitude))
                 .appendQueryParameter("keyword", (term == null) ? "" : term)
-                .appendQueryParameter("key",getString(R.string.google_maps_key))
+                .appendQueryParameter("key", getString(R.string.google_maps_key))
 //                .appendQueryParameter("pagetoken", (pagetoken == null) ? "" : pagetoken)
                 ;
 

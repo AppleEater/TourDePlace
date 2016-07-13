@@ -13,6 +13,8 @@ public class PowerReceiver extends BroadcastReceiver{
     private final String actionPowerConnect = "android.intent.action.ACTION_POWER_CONNECTED";
     private final String actionPowerDisconnect = "android.intent.action.ACTION_POWER_DISCONNECTED";
 
+    private final String TAG = "PowerReceiver";
+
     public PowerReceiver() {
     }
     @Override
@@ -21,7 +23,7 @@ public class PowerReceiver extends BroadcastReceiver{
         String localMessage = null;
         this.context = context;
 
-        Log.d("onReceive","Received action " + intentAction);
+        Log.d(TAG,"Received action " + intentAction);
         if(intentAction.equals(actionPowerConnect)){
             localMessage = context.getString(R.string.snackbar_message_power_connected);
         } else if(intentAction.equals(actionPowerDisconnect)){
@@ -31,10 +33,10 @@ public class PowerReceiver extends BroadcastReceiver{
         doSendBroadcast(localMessage);
     }
     public void doSendBroadcast(String message) {
-        Intent intentSnack = new Intent("EVENT_SNACKBAR");
+        Intent intentSnack = new Intent(context.getString(R.string.power_receiver_custom_intent_action));
 
         if (message != null)
-            intentSnack.putExtra("MESSAGE",message);
+            intentSnack.putExtra(context.getString(R.string.snackbar_message_custom_intent_extra_text),message);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intentSnack);
     }
 

@@ -15,6 +15,7 @@ import com.example.uaharoni.tourdeplace.model.Place;
 public class PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
     private Place place;
+    private Context context;
     private TextView txtPlaceName, txtPlaceAddress, txtPlaceDistance;
     private String placeName, placeAddress;
     private double placeAddLat, placeAddLong;
@@ -35,7 +36,8 @@ public class PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnC
         itemView.setOnLongClickListener(this);
     }
 
-    public void bindPlaceView(Context context, Place place, int unitSystem, Location currentLocation) {
+    public void bindPlaceView(Context context, Place place, String unitSystem, Location currentLocation) {
+        this.context = context;
         this.place = place;
         placeName = place.getName();
         placeAddress = place.getAddress().getName();
@@ -47,22 +49,17 @@ public class PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
         float distanceValue = getLocalizedDistance(placeAddLat, placeAddLong, unitSystem,currentLocation);
         String textDistance = String.valueOf(distanceValue);
-        switch (unitSystem){
-            case MainActivity.UNIT_SYSTEM_METRIC:
-                textDistance.concat(context.getString(R.string.unit_system_km));
-                break;
-            case MainActivity.UNIT_SYSTEM_US:
-                textDistance.concat(context.getString(R.string.unit_system_mi));
-                break;
-        }
-        txtPlaceDistance.setText("" + textDistance);
+        textDistance = textDistance.concat(unitSystem);
+        txtPlaceDistance.setText("" + textDistance);  //TODO: Fix with variables in Resource string
         ;
         if (iVPlaceImage != null) {
             iVPlaceImage.setImageBitmap(null);  // TODO: fix dummy code with picasso
         }
     }
-    private float getLocalizedDistance(double destLat, double destLong, int unitSystem, Location homeLocation) {
+    private float getLocalizedDistance(double destLat, double destLong, String unitSystem, Location homeLocation) {
+        String TAG = "getLocalizedDistance";
         float distanceLocalized;
+        Log.d(TAG,"Got info in " + unitSystem);
         Location remotePlace = new Location(txtPlaceName.getText().toString());
         remotePlace.setLatitude(destLat);
         remotePlace.setLongitude(destLong);
@@ -74,17 +71,12 @@ public class PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnC
         */
         float distanceMeters = homeLocation.distanceTo(remotePlace);
         //TODO: Implement Google Maps Direction API (https://developers.google.com/maps/documentation/directions/)
-        switch (unitSystem) {
-            case MainActivity.UNIT_SYSTEM_US:
-                distanceLocalized = distanceMeters / 1609.344f; // distance in miles
-                break;
-            case MainActivity.UNIT_SYSTEM_METRIC:
-                distanceLocalized = distanceMeters / 1000f;   // distance in km
-                break;
-            default:
-                distanceLocalized = distanceMeters / 1000f;
-                break;
+        if(unitSystem.equals((String)context.getString(R.string.unit_system_km))){
+            distanceLocalized = distanceMeters / 1000f;   // distance in km
+        } else {
+            distanceLocalized = distanceMeters / 1609.344f; // distance in miles
         }
+        Log.d(TAG,"Calculated distance: " + distanceLocalized + " " + unitSystem );
         return distanceLocalized;
     }
 

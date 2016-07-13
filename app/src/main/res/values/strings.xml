@@ -17,6 +17,7 @@
     <string name="snackbar_message_power_connected">Power is connected</string>
     <string name="snackbar_message_power_disconnected">Power is disconnected</string>
     <string name="snackbar_message_no_keyword">No keyword to search on</string>
+    <string name="snackbar_message_custom_intent_extra_text" translatable="false">SNACKBAR_MESSAGE</string>
 
 
     <!-- Map strings -->
@@ -126,16 +127,22 @@
     <!-- Share ActionProvider strings -->
     <string name="action_share_title">Share Place(s)</string>
 
-    <!-- AlertDisalog string -->
+    <!-- AlertDialog string -->
     <string name="alert_dialog_title">Enable Location</string>
     <string name="alert_dialog_text">Your Locations Settings is set to OFF.\nPlease Enable Location to use this app</string>
     <string name="alert_dialog_positive">Location Settings</string>
     <string name="alert_dialog_negative">Cancel</string>
 
+    <!-- Search Service -->
+    <string name="search_service_intent_query_extra" translatable="false">KEYWORD</string>
+    <string name="search_service_custom_intent_action" translatable="false">com.example.uaharoni.tourdeplace.BROADCAST</string>
+    <string name="search_service_custom_intent_status">com.example.uaharoni.tourdeplace.STATUS</string>
+
+    <!-- PowerReceiver -->
+    <string name="power_receiver_custom_intent_action" translatable="false">com.example.uaharoni.tourdeplace.SNACKBAR</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="title_activity_dummy_map">Map</string>
 
 
 </resources>
