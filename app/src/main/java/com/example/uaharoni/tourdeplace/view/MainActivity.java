@@ -20,10 +20,12 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
-    //private ViewPager viewPager;
+    private SearchView searchView;
 
 
 
@@ -157,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 Log.d("getLocByPrio","No permission. Running getLocationPermissions." );
                 getLocationPermissions();
             }
-        Log.d("getLoc","Finished getLocationByPriority for provider " + locationProvider.getName());
+        Log.d("getLocByPrio","Finished getLocationByPriority for provider " + locationProvider.getName());
 
     }
 
@@ -237,9 +239,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d("onCreateMenu","Loading menu");
         getMenuInflater().inflate(R.menu.options_menu, menu);
 
-        menu.findItem(R.id.action_search);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setIconifiedByDefault(false);
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT);
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setOnQueryTextListener(this);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -255,8 +265,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                         .addToBackStack(getString(R.string.action_settings))
                         .commit();
                 return true;
-            case R.id.action_search:
-                return true;
+
             case R.id.action_feedback:
                 return true;
             default:
@@ -285,26 +294,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        searchView.clearFocus();
         Log.d("onQuerySubmit","Query string: " + query);
-        if(query.isEmpty()) {
-            Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_no_keyword),Snackbar.LENGTH_SHORT).show();
-            return true;
-        }
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // This method always return true on API<23
-            Log.d("onCreate-Main","Permissions are granted");
+            Log.d("onQueryTextSubmit","Permissions are granted");
             initLocation();
             getLocationByPriority(locProvPassive);
         } else {
-            Log.d("onCreate","No permissions, running on API>=23. Running getLocationPermissions");
+            Log.d("onQueryTextSubmit","No permissions, running on API>=23. Running getLocationPermissions");
             getLocationPermissions();
         }
+        /*
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("onResume","Get lastKnownLocation from PassiveProvider");
+            Log.d("onQueryTextSubmit","Get lastKnownLocation from PassiveProvider");
             lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
         }
-
+        */
+        // TODO: Launch search service
         return true;
     }
 
