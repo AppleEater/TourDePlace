@@ -16,9 +16,6 @@ import java.util.Locale;
 public class SearchGplace extends IntentService {
 
     private static final String TAG = "SearchGplace";
-    public static final int STATUS_RUNNING = 0;
-    public static final int STATUS_FINISHED = 1;
-    public static final int STATUS_ERROR = 2;
 
     //sample: https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=restaurant&name=cruise&key=YOUR_API_KEY
 
@@ -70,12 +67,12 @@ public class SearchGplace extends IntentService {
         Log.d(TAG, "Service Started.");
         if (intent != null) {
             final String searchTerm = intent.getStringExtra(getString(R.string.search_service_intent_query_extra));
-            updateServiceStatus(STATUS_RUNNING);
+            updateServiceStatus(getString(R.string.search_service_status_RUNNING));
             try{
                 getPlacesList(searchTerm);
             } catch (Exception e){
                 Log.d(TAG,"Error in getPlaces. " + e.getMessage());
-                updateServiceStatus(STATUS_ERROR);
+                updateServiceStatus(getString(R.string.search_service_status_ERROR));
             }
 
             /*
@@ -93,16 +90,15 @@ public class SearchGplace extends IntentService {
         }
         Log.d(TAG,"Service Finished!"); // No need to call stopSelf()
     }
-    private void updateServiceStatus(int status){
+    private void updateServiceStatus(String status){
         Log.d(TAG,"Creating Intent for Status " + status);
         Intent localIntent = new Intent(getString(R.string.search_service_custom_intent_action));
         localIntent.putExtra(getString(R.string.search_service_custom_intent_status),status);
-        Log.d(TAG,"Broadcasting the intent");
+        Log.d(TAG,"Broadcasting the intent with status " + status);
         //LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         sendBroadcast(localIntent);
     }
     protected void getPlacesList(String query){
-        int serviceStatus = STATUS_RUNNING;
         ArrayList<Place> placeArrayList = new ArrayList<>();
         //TODO: populate ArrayList with GooglePlaces list
 
@@ -110,8 +106,7 @@ public class SearchGplace extends IntentService {
         for (int i = 0; i < placeArrayList.size() ; i++) {
             searchDbHelper.insertPlace(placeArrayList.get(i));
         }
-        serviceStatus = STATUS_FINISHED;
-        updateServiceStatus(serviceStatus);
+        updateServiceStatus(getString(R.string.search_service_status_FINISHED));
     }
 
     /**

@@ -9,7 +9,6 @@
     <string name="snackbar_action_ok">אשר</string>
     <string name="metric_system">ק״מ</string>
     <string name="british_system">מיילים</string>
-    <string name="distance_system_title">הצג מררחק ב</string>
     <string name="action_search_title">חפש סביבי</string>
     <string name="search_hint">חדר כושר/ארומה/מסעדה</string>
     <string name="snackbar_message_power_connected">המכשיר מחובר למטען</string>
@@ -42,4 +41,5 @@
     <string name="settings_searchRadius_mi_value_5000">5 מייל</string>
     <string name="settings_searchRadius_km_value_1000">1 ק״מ</string>
     <string name="settings_searchRadius_km_value_500">500 מטר</string>
+    <string name="action_share_title">שתף מקומ/ות</string>
 </resources>

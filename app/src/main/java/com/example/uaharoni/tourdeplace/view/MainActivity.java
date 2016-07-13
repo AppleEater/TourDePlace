@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,7 +12,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -47,24 +45,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
 
 
-    private SharedPreferences sharedPreferences;
-    private BroadcastReceiver snackBarMessageReceiver;
+  //  private SharedPreferences sharedPreferences;
+    private LocalReceiver snackBarMessageReceiver;
     public static LocationManager locationManager;
     public static LocationHelper locationHelper;
     public LocationProvider locProvLow,locProvHigh,locProvPassive;
 
 
-//    public static final String KEY_SEARCH_RADIUS = "SEARCH_RADIUS";
     public static final String KEY_PREF_LAT = "KEY_LAT";
     public static final String KEY_PREF_LONG = "KEY_LNG";
 
-    public static final int UNIT_SYSTEM_METRIC = 0;
-    public static final int UNIT_SYSTEM_US = 1;
-    public static final int DEFAULT_RADIUS_M = 300;
 
-    private LatLng lastLocation = null;
     private final long MIN_TIME_ms = 10000L;
     private final float MIN_DISTANCE_m = 3f;
+    private LatLng lastLocation = null;
     private Location lastKnownLocation = null;
 
     public static final int LOCATION_REQUEST_CODE = 1;
@@ -75,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+   //     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationHelper = new LocationHelper(this,locationManager);
         int orientation = getResources().getConfiguration().orientation;
@@ -85,9 +79,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         initReceivers();
         initToolBar();
         initTabs();
-
-
-
 
         Log.d("onCreate-Main","Finished onCreate");
     }
@@ -103,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             Log.d("onResume","Get lastKnownLocation from PassiveProvider");
             lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
         }
-*/
             if(lastKnownLocation == null){
             Log.d("onResume-Main", "No lastLocation available. using saved info");
             double prefLat = Double.parseDouble(sharedPreferences.getString(KEY_PREF_LAT, "32.0640349"));
@@ -113,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             lastLocation = new LatLng(lastKnownLocation.getLatitude(),lastKnownLocation.getLongitude());
         }
         Log.d("onResume-Main","Obtained last/Default location: " + lastLocation.toString());
+        */
+
         //TODO: MapFragment.setCurrentLocation(lastLocation);
     }
 
@@ -139,6 +131,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                         Log.d("onReceive","Got message " + message);
                         Snackbar.make(findViewById(R.id.main_content),message,Snackbar.LENGTH_LONG).show();
                     }
+                }
+                if(intent.getAction().equals((String)getString(R.string.search_service_custom_intent_action))){
+                    String serviceStatus = intent.getStringExtra(getString(R.string.search_service_custom_intent_status));
+
                 }
             }
         }

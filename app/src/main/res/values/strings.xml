@@ -16,7 +16,6 @@
     <string name="snackbar_action_ok">OK</string>
     <string name="snackbar_message_power_connected">Power is connected</string>
     <string name="snackbar_message_power_disconnected">Power is disconnected</string>
-    <string name="snackbar_message_no_keyword">No keyword to search on</string>
     <string name="snackbar_message_custom_intent_extra_text" translatable="false">SNACKBAR_MESSAGE</string>
 
 
@@ -122,7 +121,6 @@
 
     <!-- Search ActionProvider strings -->
     <string name="search_hint">Starbucks/Restaurant/Gym</string>
-    <!-- string name="distance_system_title">Distance units</string> -->
 
     <!-- Share ActionProvider strings -->
     <string name="action_share_title">Share Place(s)</string>
@@ -136,7 +134,11 @@
     <!-- Search Service -->
     <string name="search_service_intent_query_extra" translatable="false">KEYWORD</string>
     <string name="search_service_custom_intent_action" translatable="false">com.example.uaharoni.tourdeplace.BROADCAST</string>
-    <string name="search_service_custom_intent_status">com.example.uaharoni.tourdeplace.STATUS</string>
+    <string name="search_service_custom_intent_status" translatable="false">com.example.uaharoni.tourdeplace.STATUS</string>
+    <string name="search_service_status_RUNNING" translatable="false">0</string>
+    <string name="search_service_status_FINISHED" translatable="false">1</string>
+    <string name="search_service_status_ERROR" translatable="false">2</string>
+
 
     <!-- PowerReceiver -->
     <string name="power_receiver_custom_intent_action" translatable="false">com.example.uaharoni.tourdeplace.SNACKBAR</string>

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.model.Place;
-import com.example.uaharoni.tourdeplace.view.MainActivity;
 import com.example.uaharoni.tourdeplace.view.PlaceViewHolder;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         unitSystem = sharedPreferences.getString(parent.getContext().getString(R.string.settings_distance_units_key),parent.getContext().getString(R.string.unit_system_km));
         Log.d("onCreateViewHolder",parent.getContext().getString(R.string.settings_distance_units_key) + " = " + unitSystem);
-        searchRadius_unit = sharedPreferences.getString(parent.getContext().getString(R.string.settings_searchRadius_key), String.valueOf(MainActivity.DEFAULT_RADIUS_M));
+        searchRadius_unit = sharedPreferences.getString(parent.getContext().getString(R.string.settings_searchRadius_key), String.valueOf(1000 * Integer.parseInt(context.getString(R.string.settings_searchRadius_km_value_500))));
         Log.d("onCreateViewHolder",parent.getContext().getString(R.string.settings_searchRadius_key) + " = " + searchRadius_unit );
 
 
