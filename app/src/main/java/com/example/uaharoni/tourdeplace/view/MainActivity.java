@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
 
     private SnackBarReceiver snackBarMessageReceiver;
-    //private SearchReceiver searchServiceReceiver;
 
     public static LocationManager locationManager;
     public static LocationHelper locationHelper;
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private final long MIN_TIME_ms = 10000L;
     private final float MIN_DISTANCE_m = 3f;
-    private Location currentLocation = null;
+    public static Location currentLocation = null;
     private static final int LOCATION_REQUEST_CODE = 1;
     private static final int INTERNET_REQUEST_CODE = 2;
 
@@ -82,8 +81,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onResume();
         Log.d("onResume","onResume started.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
-        //Log.d("onResume","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
-  //      LocalBroadcastManager.getInstance(this).registerReceiver(searchServiceReceiver,new IntentFilter(getString(R.string.search_service_custom_intent_action)));
+
     }
 
     @Override
@@ -92,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("onPause","onPause started.");
         Log.d("onPause","Removing receivers");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(snackBarMessageReceiver);
-        //LocalBroadcastManager.getInstance(this).unregisterReceiver(searchServiceReceiver);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.removeUpdates(this);
         }
@@ -100,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void initReceivers(){
         snackBarMessageReceiver = new SnackBarReceiver();
-//        searchServiceReceiver = new SearchReceiver();
     }
 
     private class SnackBarReceiver extends BroadcastReceiver {
@@ -186,8 +182,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             case R.id.action_feedback:
                 return true;
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
+                // If we got here, the user's action was not recognized. Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -206,6 +201,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (mapFrag != null) {
             Log.d("onLocChanged","Updating the location in the map fragment");
             ((MapFragment)mapFrag).setCurrentLocation(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
+        }
+        SearchFragment searchFrag = (SearchFragment)((ViewPagerAdapter)viewPager.getAdapter()).getItem(searchFragId);
+        if(searchFrag != null){
+            Log.d("onLocChanged","Updating the location in the search fragment");
         }
     }
 

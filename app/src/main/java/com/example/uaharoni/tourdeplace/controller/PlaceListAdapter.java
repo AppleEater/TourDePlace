@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.model.Place;
+import com.example.uaharoni.tourdeplace.view.MainActivity;
 import com.example.uaharoni.tourdeplace.view.PlaceViewHolder;
 
 import java.util.ArrayList;
@@ -31,11 +32,14 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
     public PlaceListAdapter(ArrayList<Place> placeList, int viewId) {
         this.places = placeList;
         this.viewId = viewId;
+        currentLocation = MainActivity.currentLocation;
+        /*
         //Test Location
         currentLocation = new Location("Homee");
         currentLocation.setLatitude(Double.parseDouble("31.9142638"));
         currentLocation.setLongitude(Double.parseDouble("34.7861329"));
-
+        */
+        Log.d("PlaceListAdapter","Got CurrentLocation: ");
     }
 
     @Override
