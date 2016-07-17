@@ -33,13 +33,7 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
         this.places = placeList;
         this.viewId = viewId;
         currentLocation = MainActivity.currentLocation;
-        /*
-        //Test Location
-        currentLocation = new Location("Homee");
-        currentLocation.setLatitude(Double.parseDouble("31.9142638"));
-        currentLocation.setLongitude(Double.parseDouble("34.7861329"));
-        */
-        Log.d("PlaceListAdapter","Got CurrentLocation: ");
+        Log.d("PlaceListAdapter","Got CurrentLocation ");
     }
 
     @Override

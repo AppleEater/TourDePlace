@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.PlaceListAdapter;
@@ -29,6 +30,8 @@ public class SearchFragment extends Fragment {
 
     private SearchResultsTBL searchDbHelper;
     private SearchReceiver searchServiceReceiver;
+    private PlaceListAdapter searchAdapter;
+    static ProgressBar progressBar;
 
     private ShareActionProvider shareProvider;
 
@@ -51,10 +54,13 @@ public class SearchFragment extends Fragment {
 
 
         RecyclerView recyclerView = (RecyclerView) searchFragLayout.findViewById(R.id.rv_search);
-        PlaceListAdapter searchAdapter = new PlaceListAdapter(searchDbHelper.getAllPlaces(),R.id.rv_search);
+        searchAdapter = new PlaceListAdapter(searchDbHelper.getAllPlaces(),R.id.rv_search);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(searchAdapter);
+
+        progressBar = (ProgressBar) container.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
 
         return searchFragLayout;
     }
@@ -72,7 +78,18 @@ public class SearchFragment extends Fragment {
         Log.d("onPauseSearchFrag","Removing receivers");
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchServiceReceiver);
     }
-
+    public static void updateProgressBar(int statusCde) {
+        switch (statusCde){
+            case 0:
+                progressBar.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                progressBar.setVisibility(View.GONE);
+                break;
+            case 2:
+                progressBar.setVisibility(View.GONE);
+        }
+    }
 
     @Override
     public void onAttach(Context context) {

@@ -7,6 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.view.SearchFragment;
 
 public class SearchReceiver extends BroadcastReceiver {
 
@@ -42,6 +43,7 @@ public class SearchReceiver extends BroadcastReceiver {
                 }
                 intentSnack.putExtra(context.getString(R.string.snackbar_message_custom_intent_extra_text),message);
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intentSnack);
+                SearchFragment.updateProgressBar(Integer.parseInt(serviceStatus));
             }
         }
     }
