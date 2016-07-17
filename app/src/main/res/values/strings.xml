@@ -138,6 +138,8 @@
     <string name="search_service_status_RUNNING" translatable="false">0</string>
     <string name="search_service_status_FINISHED" translatable="false">1</string>
     <string name="search_service_status_ERROR" translatable="false">2</string>
+    <string name="search_service_intent_location_extra" translatable="false">LOC_ARR</string>
+    <string name="search_service_location_name">You are here</string>
 
 
     <!-- PowerReceiver -->

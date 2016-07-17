@@ -3,6 +3,7 @@ package com.example.uaharoni.tourdeplace.controller;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
@@ -67,6 +68,11 @@ public class SearchGplace extends IntentService {
         Log.d(TAG, "Service Started.");
         if (intent != null) {
             final String searchTerm = intent.getStringExtra(getString(R.string.search_service_intent_query_extra));
+            double[] locArray = intent.getDoubleArrayExtra(getString(R.string.search_service_intent_location_extra));
+            Location loc = new Location(getString(R.string.search_service_location_name));
+            loc.setLatitude(locArray[0]);
+            loc.setLongitude(locArray[1]);
+            Log.d(TAG,"Search term: " + searchTerm + ", Location: " + loc.toString());
             updateServiceStatus(getString(R.string.search_service_status_RUNNING));
             try{
                 getPlacesList(searchTerm);

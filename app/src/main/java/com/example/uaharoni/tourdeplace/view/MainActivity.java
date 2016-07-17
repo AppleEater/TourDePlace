@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,10 +13,12 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
@@ -33,7 +36,6 @@ import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.SearchGplace;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
-import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, SearchView.OnQueryTextListener {
 
@@ -41,40 +43,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private TabLayout tabLayout;
     ViewPager viewPager;
     private SearchView searchView;
-    int searchFragId;
+    int searchFragId,mapFragId,favFragId;
 
 
-
-  //  private SharedPreferences sharedPreferences;
     private LocalReceiver snackBarMessageReceiver;
     public static LocationManager locationManager;
     public static LocationHelper locationHelper;
-    public LocationProvider locProvLow,locProvHigh,locProvPassive;
+    private String searchTerm = null;
+    private LocationProvider locProvLow,locProvHigh,locProvPassive;
 
 
-    public static final String KEY_PREF_LAT = "KEY_LAT";
+    public static final String KEY_PREF_LAT  = "KEY_LAT";
     public static final String KEY_PREF_LONG = "KEY_LNG";
 
 
     private final long MIN_TIME_ms = 10000L;
     private final float MIN_DISTANCE_m = 3f;
-    private LatLng lastLocation = null;
-    private Location lastKnownLocation = null;
-
-    public static final int LOCATION_REQUEST_CODE = 1;
-
+    private Location currentLocation = null;
+    private static final int LOCATION_REQUEST_CODE = 1;
+    private static final int INTERNET_REQUEST_CODE = 2;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-   //     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationHelper = new LocationHelper(this,locationManager);
-        int orientation = getResources().getConfiguration().orientation;
-        int screenSize = getResources().getConfiguration().screenWidthDp;
-        Log.d("omCreate","Running on screen resolution: " + screenSize + ", orientation: " + orientation);
 
         initReceivers();
         initToolBar();
@@ -88,24 +83,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onResume();
         Log.d("onResume-Main","onResume started.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
-
-        /*
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("onResume","Get lastKnownLocation from PassiveProvider");
-            lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
-        }
-            if(lastKnownLocation == null){
-            Log.d("onResume-Main", "No lastLocation available. using saved info");
-            double prefLat = Double.parseDouble(sharedPreferences.getString(KEY_PREF_LAT, "32.0640349"));
-            double prefLong = Double.parseDouble(sharedPreferences.getString(KEY_PREF_LONG, "34.7844135"));
-            lastLocation = new LatLng(prefLat, prefLong);
-        } else {
-            lastLocation = new LatLng(lastKnownLocation.getLatitude(),lastKnownLocation.getLongitude());
-        }
-        Log.d("onResume-Main","Obtained last/Default location: " + lastLocation.toString());
-        */
-
-        //TODO: MapFragment.setCurrentLocation(lastLocation);
     }
 
     @Override
@@ -120,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private void initReceivers(){
         snackBarMessageReceiver = new LocalReceiver();
     }
+
     private class LocalReceiver extends BroadcastReceiver {
 
         @Override
@@ -139,72 +117,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         }
     }
-    public void initLocation(){
-        // Get passive provider
-        locProvPassive =
-                locationManager.getProvider(LocationManager.PASSIVE_PROVIDER);
-        // get low accuracy provider
-        locProvLow=
-                locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createCoarseCriteria(),true));
-        // get high accuracy provider
-        locProvHigh=
-                locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createFineCriteria(),true));
-    }
-    public void getLocationByPriority(@NonNull LocationProvider locationProvider){
-        // Checking for permissions
-            if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-               Log.d("getLocByPrio","Permissions exist for provider " + locationProvider.getName());
-               // lastKnownLocation = locationManager.getLastKnownLocation(locationProvider.getName());
-                locationManager.requestLocationUpdates(locationProvider.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
-            }
-            else {
-                // If we're here - we're on API>=23 and didn't get permissions before
-                Log.d("getLocByPrio","No permission. Running getLocationPermissions." );
-                getLocationPermissions();
-            }
-        Log.d("getLocByPrio","Finished getLocationByPriority for provider " + locationProvider.getName());
-
-    }
-
-    private void getLocationPermissions(){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
-                Log.d("getLocPermisns","Explain to the user why we need to get location");
-                Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_location_permissions_needed),Snackbar.LENGTH_INDEFINITE)
-                        .setAction(getString(R.string.snackbar_action_ok), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Log.d("onClick-GetLocPerms","Requesting permissions after Snackbar message");
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST_CODE);
-                                }
-                            }
-                        })
-                        .show();
-            } else {
-                Log.d("getLocPermisns","Requesting permissions after checking for rationale");
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST_CODE);
-            }
-
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull final String[] permissions, @NonNull int[] grantResults) {
-        Log.d("RequestPerms", "Got grantResult " + grantResults[0] + " for permission " + permissions[0]);
-        switch (requestCode) {
-            case LOCATION_REQUEST_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("RequestPerms", "Permission granted. Running initLocation with getLocationByPriority(Passive)");
-                    initLocation();
-                    getLocationByPriority(locProvPassive);
-                } else {
-                    Log.d("RequestPerms", "Location Permissions denied");
-                }
-                break;
-            default:
-                Log.d("RequestPerms", "No requestCode. Falling back");
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                break;
-        }
-    }
     private void initToolBar(){
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -216,8 +128,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         Log.d("initTabs","Adding Fragments");
         searchFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_search));
-        int mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
-        int favFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_favorites));
+        mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
+        favFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_favorites));
 
         Log.d("initTabs","Connecting the tabs to the Adapter");
         viewPager.setAdapter(viewPagerAdapter);
@@ -249,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setIconifiedByDefault(false);
         searchView.setInputType(InputType.TYPE_CLASS_TEXT);
-        searchView.setSubmitButtonEnabled(true);
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setOnQueryTextListener(this);
 
@@ -280,7 +191,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onLocationChanged(Location location) {
+        currentLocation = location;
+        Log.d("onLocChange","Got Location " + location.toString());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit()
+                .putString(getString(R.string.settings_last_location_latitude),String.valueOf(currentLocation.getLatitude()))
+                .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLatitude()))
+                .apply();
+
        //TODO: MapFragment.setCurrentLocation(lastLocation);
+        Fragment map = getSupportFragmentManager().findFragmentById(mapFragId);
+        Log.d("onLocChanged","Updating the location in the map fragment");
     }
 
     @Override
@@ -294,33 +215,115 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onProviderDisabled(String s) {
     }
-
     @Override
     public boolean onQueryTextSubmit(String query) {
         searchView.clearFocus();
         Log.d("onQuerySubmit","Query string: " + query);
+        searchTerm = query.trim();
         viewPager.setCurrentItem(0);
 
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // This method always return true on API<23
-            Log.d("onQueryTextSubmit","Permissions are granted");
-            initLocation();
-            getLocationByPriority(locProvPassive);
+            Log.d("onQueryTextSubmit","Permissions are granted. This means we're either on API<23 or not a first run");
+            searchGooglePlaces();
         } else {
-            Log.d("onQueryTextSubmit","No permissions, running on API>=23. Running getLocationPermissions");
             getLocationPermissions();
         }
-        /*
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("onQueryTextSubmit","Get lastKnownLocation from PassiveProvider");
-            lastKnownLocation = locationManager.getLastKnownLocation(locProvLow.getName());
-        }
-        */
-        Intent serviceSearch = new Intent(this,SearchGplace.class);
-        serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),query.trim());
-        startService(serviceSearch);
         return true;
+    }
+    private void searchGooglePlaces(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("searchGooglePlaces","Internet permissions exist");
+            getLocationUpdates();
+            if(currentLocation == null){
+                Log.d("searchGooglePlaces","No current location. Using from Preferences");
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude),"32.0640349");
+                String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude),"34.7844082");
+                currentLocation = new Location(getString(R.string.search_service_location_name));
+                currentLocation.setLatitude(Double.parseDouble(latPref));
+                currentLocation.setLongitude(Double.parseDouble(longtPref));
+            }
+                Intent serviceSearch = new Intent(this,SearchGplace.class);
+                serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),searchTerm);
+                serviceSearch.putExtra(getString(R.string.search_service_intent_location_extra),new double[] {currentLocation.getLatitude(),currentLocation.getLongitude()});
+                Log.d("searchGooglePlaces","We have permissions. Starting the search service");
+                startService(serviceSearch);
+            }
+        else {
+            Log.d("searchGooglePlaces","No permission to access the network. Requesting permissions");
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.INTERNET},INTERNET_REQUEST_CODE);
+        }
+    }
+    private void getLocationUpdates() {
+        Log.d("getLocation", "Obtaining providers");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("getLocation", "Permissions exist for getting providers.");
+            Log.d("getLocation", "Getting provider Passive");
+            locProvPassive =
+                    locationManager.getProvider(LocationManager.PASSIVE_PROVIDER);
+            Log.d("getLocation", "Getting provider Low");
+            locProvLow =
+                    locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createCoarseCriteria(), true));
+            Log.d("getLocation", "Getting provider High");
+            locProvHigh =
+                    locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createFineCriteria(), true));
+            Log.d("getLocation", "Checking if providers exist...");
+            if (locProvHigh == null && locProvLow == null & locProvPassive == null) {
+                Log.d("getLocation", "No providers exist. Alerting");
+                locationHelper.showLocationSettingsAlert();
+            } else {
+                Log.d("getLocation", "High access providers exist.");
+                locationManager.requestLocationUpdates(locProvHigh.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
+                currentLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
+            }
+        }
+    }
+
+    private void getLocationPermissions(){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
+            Log.d("getLocPermsns","Explain to the user why we need to get location");
+            Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_location_permissions_needed),Snackbar.LENGTH_INDEFINITE)
+                    .setAction(getString(R.string.snackbar_action_ok), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.d("getLocPermsns","Requesting permissions after Snackbar message");
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST_CODE);
+                            }
+                        }
+                    })
+                    .show();
+        } else {
+            Log.d("getLocPermsns","Requesting permissions after checking for rationale");
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST_CODE);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull final String[] permissions, @NonNull int[] grantResults) {
+        Log.d("RequestPerms", "Got grantResult " + grantResults[0] + " for permission " + permissions[0]);
+        switch (requestCode) {
+            case LOCATION_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("RequestPerms", "Permission granted. Running");
+                    searchGooglePlaces();
+                } else {
+                    Log.d("RequestPerms", "Location Permissions denied on API>=23");
+                    Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_no_location_permissions),Snackbar.LENGTH_LONG).show();
+                }
+                break;
+            case INTERNET_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("RequestPerms","Internet permission granted.");
+                    searchGooglePlaces();
+                } else {
+                    Log.d("RequestPerms","Internet permissions denied");
+                }
+                break;
+            default:
+                Log.d("RequestPerms", "No requestCode. Falling back");
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
     }
 
     @Override
