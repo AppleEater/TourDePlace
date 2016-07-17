@@ -64,19 +64,30 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Log.d("onPrefsChange","Pref: " + preference.getKey() + " got value " + newValue.toString());
 
         if(preference.getKey().equals(getString(R.string.settings_searchRadius_key))){
-            Log.d("onPrefsChange","Entry name: " + ((ListPreference)preference).getEntries()[((ListPreference)preference).findIndexOfValue(newValue.toString())] );
+            String newEntryValue = (String) ((ListPreference)preference).getEntries()[((ListPreference)preference).findIndexOfValue(newValue.toString())];
+            Log.d("onPrefsChange","Entry name: " + newEntryValue);
+            preference.setSummary(newEntryValue);
         }
 
         if(preference.getKey().equals(getString(R.string.settings_distance_units_key))){
             Log.d("onPrefsChange","New entry name: " + ((ListPreference)preference).getEntries()[((ListPreference)preference).findIndexOfValue(newValue.toString())]);
             String[] newEntries=null;
+            ListPreference searchRadius = (ListPreference)getPreferenceManager().findPreference(getText(R.string.settings_searchRadius_key));
+            String searchRadiusCurVal = searchRadius.getValue();
+            int searchRadiusCurEntry = searchRadius.findIndexOfValue(searchRadiusCurVal);
+
             if(newValue.toString().equals(getString(R.string.unit_system_mi))){
                 newEntries = getResources().getStringArray(R.array.settings_searchRadius_mi_entries);
+
             } else if(newValue.toString().equals(getString(R.string.unit_system_km))){
+                Log.d("onPrefsChange","Modifying the entries list for the searchRadius");
                 newEntries = getResources().getStringArray(R.array.settings_searchRadius_km_entries);
             }
+
             Log.d("onPrefsChange","Modifying the entries list for the searchRadius");
-            ((ListPreference)getPreferenceManager().findPreference(getString(R.string.settings_searchRadius_key))).setEntries(newEntries);
+            searchRadius.setEntries(newEntries);
+            String searchRadiusNewEntry = (String) searchRadius.getEntries()[searchRadiusCurEntry];
+            searchRadius.setSummary(searchRadiusNewEntry);
 
             }
             return true;
