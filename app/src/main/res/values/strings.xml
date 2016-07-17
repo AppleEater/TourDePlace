@@ -133,11 +133,16 @@
 
     <!-- Search Service -->
     <string name="search_service_intent_query_extra" translatable="false">KEYWORD</string>
-    <string name="search_service_custom_intent_action" translatable="false">com.example.uaharoni.tourdeplace.BROADCAST</string>
-    <string name="search_service_custom_intent_status" translatable="false">com.example.uaharoni.tourdeplace.STATUS</string>
+    <string name="search_service_custom_intent_action" translatable="false">com.example.uaharoni.tourdeplace.SEARCH_SERVICE_BROADCAST</string>
+    <string name="search_service_custom_intent_status" translatable="false">SEARCH_SERVICE_STATUS</string>
     <string name="search_service_status_RUNNING" translatable="false">0</string>
     <string name="search_service_status_FINISHED" translatable="false">1</string>
     <string name="search_service_status_ERROR" translatable="false">2</string>
+    <string name="search_service_status_RUNNING_text">Search is running. Please wait.</string>
+    <string name="search_service_status_FINISHED_text">Search finished!</string>
+    <string name="search_service_status_ERROR_text">Search got errors and stopped. Please try again..</string>
+    <string name="search_service_status_UNKNOWN_text">Got unnown error. Please try again.</string>
+
     <string name="search_service_intent_location_extra" translatable="false">LOC_ARR</string>
     <string name="search_service_location_name">You are here</string>
 

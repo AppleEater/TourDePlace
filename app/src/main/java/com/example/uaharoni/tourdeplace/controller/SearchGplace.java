@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.example.uaharoni.tourdeplace.R;
@@ -74,7 +75,9 @@ public class SearchGplace extends IntentService {
             loc.setLongitude(locArray[1]);
             Log.d(TAG,"Search term: " + searchTerm + ", Location: " + loc.toString());
             updateServiceStatus(getString(R.string.search_service_status_RUNNING));
+            //TODO: Display progressBar in status 0
             try{
+                Log.d(TAG,"Running the getPlacesList with keyword: " + searchTerm);
                 getPlacesList(searchTerm);
             } catch (Exception e){
                 Log.d(TAG,"Error in getPlaces. " + e.getMessage());
@@ -101,8 +104,7 @@ public class SearchGplace extends IntentService {
         Intent localIntent = new Intent(getString(R.string.search_service_custom_intent_action));
         localIntent.putExtra(getString(R.string.search_service_custom_intent_status),status);
         Log.d(TAG,"Broadcasting the intent with status " + status);
-        //LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
-        sendBroadcast(localIntent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
     protected void getPlacesList(String query){
         ArrayList<Place> placeArrayList = new ArrayList<>();
@@ -113,6 +115,7 @@ public class SearchGplace extends IntentService {
             searchDbHelper.insertPlace(placeArrayList.get(i));
         }
         updateServiceStatus(getString(R.string.search_service_status_FINISHED));
+        //TODO: Hide progressBar in activity when service finished
     }
 
     /**

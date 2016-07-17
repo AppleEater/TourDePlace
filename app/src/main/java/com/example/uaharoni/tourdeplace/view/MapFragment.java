@@ -3,8 +3,6 @@ package com.example.uaharoni.tourdeplace.view;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -30,7 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static GoogleMap mMap;
     private final int LOCATION_REQUEST_CODE = 1;
@@ -130,7 +128,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
 
 
-    protected void setCurrentLocation(@Nullable LatLng updatedLocation) {
+    public void setCurrentLocation(@Nullable LatLng updatedLocation) {
         Log.d("setCurrntLcatn-MapFrag", "Got LatLng location");
         if (currentLocationMarker != null) {
             currentLocationMarker.remove();
@@ -169,38 +167,5 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         CameraPosition cameraPosition = new CameraPosition.Builder().zoom(19).tilt(20).target(location).build();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
         mMap.moveCamera(cameraUpdate);
-    }
-
-
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        Log.d("onLocChanged","Saving location to SharedPrefs");
-        try {
-            sharedPreferences.edit()
-                    .putString(MainActivity.KEY_PREF_LAT, String.valueOf(location.getLatitude()))
-                    .putString(MainActivity.KEY_PREF_LONG, String.valueOf(location.getLongitude()))
-                    .commit();
-        } catch (Exception e) {
-            Log.d("onLocChanged-MapFrag", "Error in saving to Prefs. " + e.getMessage());
-        }
-
-        LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
-        Log.d("onLocChanged","Updating current location");
-        setCurrentLocation(currentLoc);
-    }
-
-    @Override
-    public void onStatusChanged(String providerName, int providerStatus, Bundle bundle) {
-        Log.d("onStatusChanged-MapFrag", "Provider " + providerName + " changed status to " + providerStatus);
-    }
-
-    @Override
-    public void onProviderEnabled(String providerName) {
-        Log.d("ProviderEnabled-MapFrag", "Provider " + providerName + " enabled. Getting updated location");
-    }
-
-    @Override
-    public void onProviderDisabled(String providerName) {
-        Log.d("ProvdrDsabled-MapFrag", "Provider " + providerName + " disabled. Getting updated location with new provider");
     }
 }

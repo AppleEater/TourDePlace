@@ -21,17 +21,21 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
 
     private ArrayList<Place> places;
     private int viewId;
-    private SharedPreferences sharedPreferences;
-    private Location currentLocation;
+    //private SharedPreferences sharedPreferences;
+    private static Location currentLocation;
 
     private String unitSystem,searchRadius_unit;
 
     private Context context;
 
-    public PlaceListAdapter(ArrayList<Place> placeList, int viewId,Location location) {
+    public PlaceListAdapter(ArrayList<Place> placeList, int viewId) {
         this.places = placeList;
         this.viewId = viewId;
-        this.currentLocation = location;
+        //Test Location
+        currentLocation = new Location("Homee");
+        currentLocation.setLatitude(Double.parseDouble("31.9142638"));
+        currentLocation.setLongitude(Double.parseDouble("34.7861329"));
+
     }
 
     @Override
@@ -60,7 +64,7 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
                 break;
         }
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         unitSystem = sharedPreferences.getString(parent.getContext().getString(R.string.settings_distance_units_key),parent.getContext().getString(R.string.unit_system_km));
         Log.d("onCreateViewHolder",parent.getContext().getString(R.string.settings_distance_units_key) + " = " + unitSystem);
         searchRadius_unit = sharedPreferences.getString(parent.getContext().getString(R.string.settings_searchRadius_key), String.valueOf(1000 * Integer.parseInt(context.getString(R.string.settings_searchRadius_km_value_500))));

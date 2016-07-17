@@ -42,4 +42,9 @@
     <string name="settings_searchRadius_km_value_1000">1 ק״מ</string>
     <string name="settings_searchRadius_km_value_500">500 מטר</string>
     <string name="action_share_title">שתף מקומ/ות</string>
+    <string name="search_service_location_name">אתה נמצא כאן</string>
+    <string name="search_service_status_ERROR_text">חיפוש מקומות נכשל. אנא נסה שנית.</string>
+    <string name="search_service_status_FINISHED_text">חיפוש מקומות הסתיים.</string>
+    <string name="search_service_status_RUNNING_text">חיפוש מקומות מתבצע.</string>
+    <string name="search_service_status_UNKNOWN_text">חיפוש מקומות נכשל. נסה שוב.</string>
 </resources>

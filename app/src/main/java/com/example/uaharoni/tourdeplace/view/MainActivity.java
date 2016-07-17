@@ -33,9 +33,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.uaharoni.tourdeplace.R;
-import com.example.uaharoni.tourdeplace.controller.SearchGplace;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, SearchView.OnQueryTextListener {
 
@@ -46,15 +46,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     int searchFragId,mapFragId,favFragId;
 
 
-    private LocalReceiver snackBarMessageReceiver;
+    private SnackBarReceiver snackBarMessageReceiver;
+    //private SearchReceiver searchServiceReceiver;
+
     public static LocationManager locationManager;
     public static LocationHelper locationHelper;
     private String searchTerm = null;
     private LocationProvider locProvLow,locProvHigh,locProvPassive;
 
-
-    public static final String KEY_PREF_LAT  = "KEY_LAT";
-    public static final String KEY_PREF_LONG = "KEY_LNG";
 
 
     private final long MIN_TIME_ms = 10000L;
@@ -81,38 +80,41 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("onResume-Main","onResume started.");
+        Log.d("onResume","onResume started.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
+        //Log.d("onResume","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
+  //      LocalBroadcastManager.getInstance(this).registerReceiver(searchServiceReceiver,new IntentFilter(getString(R.string.search_service_custom_intent_action)));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("onPause","onPause started.");
+        Log.d("onPause","Removing receivers");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(snackBarMessageReceiver);
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(searchServiceReceiver);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.removeUpdates(this);
         }
     }
 
     private void initReceivers(){
-        snackBarMessageReceiver = new LocalReceiver();
+        snackBarMessageReceiver = new SnackBarReceiver();
+//        searchServiceReceiver = new SearchReceiver();
     }
 
-    private class LocalReceiver extends BroadcastReceiver {
+    private class SnackBarReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent !=null){
-                if(intent.getAction() .equals((String)getString(R.string.power_receiver_custom_intent_action))){
+                Log.d("onReceive","Got intent " + intent.toString());
+                if(intent.getAction() .equals(getString(R.string.power_receiver_custom_intent_action))){
                     String message = intent.getStringExtra(getString(R.string.snackbar_message_custom_intent_extra_text));
                     if(message != null){
                         Log.d("onReceive","Got message " + message);
                         Snackbar.make(findViewById(R.id.main_content),message,Snackbar.LENGTH_LONG).show();
                     }
-                }
-                if(intent.getAction().equals((String)getString(R.string.search_service_custom_intent_action))){
-                    String serviceStatus = intent.getStringExtra(getString(R.string.search_service_custom_intent_status));
-
                 }
             }
         }
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());;
 
         Log.d("initTabs","Adding Fragments");
-        searchFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_search));
+        searchFragId  = viewPagerAdapter.addFragment(new SearchFragment(),getString(R.string.tab_search));
         mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
         favFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_favorites));
 
@@ -199,9 +201,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLatitude()))
                 .apply();
 
-       //TODO: MapFragment.setCurrentLocation(lastLocation);
-        Fragment map = getSupportFragmentManager().findFragmentById(mapFragId);
-        Log.d("onLocChanged","Updating the location in the map fragment");
+        Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
+        if (mapFrag != null) {
+            Log.d("onLocChanged","Updating the location in the map fragment");
+            ((MapFragment)mapFrag).setCurrentLocation(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
+        }
     }
 
     @Override
@@ -243,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 currentLocation.setLatitude(Double.parseDouble(latPref));
                 currentLocation.setLongitude(Double.parseDouble(longtPref));
             }
-                Intent serviceSearch = new Intent(this,SearchGplace.class);
+                Intent serviceSearch = new Intent(this,com.example.uaharoni.tourdeplace.controller.SearchGplace.class);
                 serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),searchTerm);
                 serviceSearch.putExtra(getString(R.string.search_service_intent_location_extra),new double[] {currentLocation.getLatitude(),currentLocation.getLongitude()});
                 Log.d("searchGooglePlaces","We have permissions. Starting the search service");
