@@ -30,7 +30,7 @@ public class SearchFragment extends Fragment {
 
     private SearchResultsTBL searchDbHelper;
     private SearchReceiver searchServiceReceiver;
-    private PlaceListAdapter searchAdapter;
+    private static PlaceListAdapter searchAdapter;
     static ProgressBar progressBar;
 
     private ShareActionProvider shareProvider;
@@ -89,6 +89,7 @@ public class SearchFragment extends Fragment {
             case 2:
                 progressBar.setVisibility(View.GONE);
         }
+        searchAdapter.notifyDataSetChanged();
     }
 
     @Override
