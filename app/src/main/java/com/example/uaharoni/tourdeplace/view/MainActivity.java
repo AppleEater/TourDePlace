@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         favFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_favorites));
 
         Log.d("initTabs","Connecting the tabs to the Adapter");
+        viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(viewPagerAdapter);
 
         Log.d("initTabs","Creating tabLayout");

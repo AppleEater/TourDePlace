@@ -41,11 +41,6 @@ public class SearchFragment extends Fragment {
         super.onCreate(savedInstanceState);
         searchDbHelper = new SearchResultsTBL(getContext());
         searchServiceReceiver = new SearchReceiver();
-        Log.d("onCreateSearchFrag","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
-    //    getActivity().getApplicationContext().registerReceiver(searchServiceReceiver,new IntentFilter(getString(R.string.search_service_custom_intent_action)));
-   //     getActivity().registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
-
-
     }
 
     @Override
@@ -67,8 +62,8 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d("onResumeSearchFrag","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
         LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
-
     }
 
     @Override
@@ -76,8 +71,6 @@ public class SearchFragment extends Fragment {
         super.onPause();
         Log.d("onPauseSearchFrag","Removing receivers");
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchServiceReceiver);
-        //getActivity().getApplicationContext().unregisterReceiver(searchServiceReceiver);
-
     }
 
 
