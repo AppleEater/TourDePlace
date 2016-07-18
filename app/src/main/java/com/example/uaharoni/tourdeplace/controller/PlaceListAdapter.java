@@ -39,9 +39,9 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceViewHolder> {
     @Override
     public int getItemViewType(int position) {
         switch (viewId){
-
             case R.id.rv_search:
                 return R.id.rv_search;
+            //TODO: Add rv_fav support
             default:
                 return super.getItemViewType(position);
         }

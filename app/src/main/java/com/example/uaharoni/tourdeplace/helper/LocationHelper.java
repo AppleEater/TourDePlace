@@ -3,9 +3,12 @@ package com.example.uaharoni.tourdeplace.helper;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.LocationManager;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
@@ -19,11 +22,6 @@ public class LocationHelper {
     public LocationHelper(Context context, LocationManager locationManager) {
         this.locationManager = locationManager;
         this.context = context;
-    }
-    public boolean isLocationEnabled() {
-
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
     public void showLocationSettingsAlert() {
         //TODO: switch toDialogFragment
@@ -89,7 +87,19 @@ public class LocationHelper {
         c.setCostAllowed(true);
         c.setPowerRequirement(Criteria.POWER_HIGH);
         return c;
-
+    }
+    public long getRadiusinM(@NonNull String searchRadius){
+        long radius = 0;
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String distanceUnit = sp.getString(context.getString(R.string.settings_distance_units_key),context.getString(R.string.unit_system_km));
+        if(distanceUnit.equals(context.getString(R.string.unit_system_km))){
+            radius = (long)(Double.parseDouble(searchRadius)*1000); //distance in Meters
+        } else {
+            // Assuming distance is in Miles
+            radius = (long)(Double.parseDouble(searchRadius)*1609.344);
+        }
+        Log.d("getRaiusinM","Converted " + searchRadius + " " + distanceUnit + " to " + radius + " meters");
+        return radius;
     }
 
 }

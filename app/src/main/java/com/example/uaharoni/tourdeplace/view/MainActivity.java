@@ -237,28 +237,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         return true;
     }
     private void searchGooglePlaces(){
-        String searchRadiusM = "0";
+        long searchRadiusM = 0;
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("searchGooglePlaces","Internet permissions exist");
+            Log.d("searchGooglePlaces","Internet permissions exist. Getting locationUpdates");
             getLocationUpdates();
+
+            Log.d("searchGooglePlaces","Returned to searchGooglePlace. Getting info from Preferences");
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "32.0640349");
+            String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "34.7844082");
+            String searchRadius = sharedPreferences.getString(getString(R.string.settings_searchRadius_key),getString(R.string.settings_searchRadius_value_500));
+            searchRadiusM = locationHelper.getRadiusinM(searchRadius);
+
             if(currentLocation == null) {
                 Log.d("searchGooglePlaces", "No current location. Using from Preferences");
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "32.0640349");
-                String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "34.7844082");
                 currentLocation = new Location(getString(R.string.search_service_location_name));
                 currentLocation.setLatitude(Double.valueOf(latPref));
                 currentLocation.setLongitude(Double.valueOf(longtPref));
                 Log.d("searchGooglePlaces", "Saved location: " + currentLocation);
             }
-
                 Intent serviceSearch = new Intent(this,com.example.uaharoni.tourdeplace.controller.SearchGplace.class);
                 serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),searchTerm);
-                serviceSearch.putExtra(getString(R.string.search_service_intent_search_radius_m_extra),searchRadiusM);
+                serviceSearch.putExtra(getString(R.string.search_service_intent_search_radius_m_extra), Long.toString(searchRadiusM));
 
                 serviceSearch.putExtra(getString(R.string.search_service_intent_location_name_extra),currentLocation.getProvider());
                 serviceSearch.putExtra(getString(R.string.search_service_intent_location_extra),new double[] {currentLocation.getLatitude(),currentLocation.getLongitude()});
-            Log.d("searchGooglePlaces","Location Info: " + currentLocation.getLatitude() + "," + currentLocation.getLongitude());
+                Log.d("searchGooglePlaces","Location Info: " + currentLocation.getLatitude() + "," + currentLocation.getLongitude());
                 Log.d("searchGooglePlaces","We have permissions. Starting the search service");
                 startService(serviceSearch);
             }
@@ -285,9 +289,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 Log.d("getLocation", "No providers exist. Alerting");
                 locationHelper.showLocationSettingsAlert();
             } else {
-                Log.d("getLocation", "High access providers exist.");
+                Log.d("getLocation", "High access providers exist. Getting currentLocation");
                 locationManager.requestLocationUpdates(locProvHigh.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
                 currentLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
+                Log.d("getLocation","Current location is " + currentLocation.toString());
             }
         }
     }
