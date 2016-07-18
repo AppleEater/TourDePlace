@@ -37,7 +37,7 @@ public class SearchGplace extends IntentService {
             Location targetLocation = new Location(locationName);
             targetLocation.setLatitude(locArray[0]);
             targetLocation.setLongitude(locArray[1]);
-            Log.d(TAG,"Search term: " + searchTerm + ", Location: " + targetLocation.toString() + ", radius: " + searchRadiusM);
+            Log.d(TAG,"Search term received: " + searchTerm + ", Location: " + targetLocation.toString() + ", radius: " + searchRadiusM);
             updateServiceStatus(getString(R.string.search_service_status_RUNNING));
             //TODO: Display progressBar in status 0
             try{

@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         return true;
     }
     private void searchGooglePlaces(){
-        int searchRadiusM = 0;
+        String searchRadiusM = "0";
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
             Log.d("searchGooglePlaces","Internet permissions exist");
             getLocationUpdates();
@@ -248,16 +248,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "32.0640349");
                 String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "34.7844082");
                 currentLocation = new Location(getString(R.string.search_service_location_name));
-                currentLocation.setLatitude(Double.parseDouble(latPref));
-                currentLocation.setLongitude(Double.parseDouble(longtPref));
+                currentLocation.setLatitude(Double.valueOf(latPref));
+                currentLocation.setLongitude(Double.valueOf(longtPref));
+                Log.d("searchGooglePlaces", "Saved location: " + currentLocation);
             }
 
                 Intent serviceSearch = new Intent(this,com.example.uaharoni.tourdeplace.controller.SearchGplace.class);
                 serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),searchTerm);
-                serviceSearch.putExtra(getString(R.string.search_service_intent_search_radius_m_extra),String.valueOf(searchRadiusM));
+                serviceSearch.putExtra(getString(R.string.search_service_intent_search_radius_m_extra),searchRadiusM);
 
                 serviceSearch.putExtra(getString(R.string.search_service_intent_location_name_extra),currentLocation.getProvider());
                 serviceSearch.putExtra(getString(R.string.search_service_intent_location_extra),new double[] {currentLocation.getLatitude(),currentLocation.getLongitude()});
+            Log.d("searchGooglePlaces","Location Info: " + currentLocation.getLatitude() + "," + currentLocation.getLongitude());
                 Log.d("searchGooglePlaces","We have permissions. Starting the search service");
                 startService(serviceSearch);
             }
