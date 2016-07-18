@@ -3,10 +3,13 @@ package com.example.uaharoni.tourdeplace.view;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -37,7 +40,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String BUNDLE_KEY = "PLACE";
     private static Marker currentLocationMarker;
-    private Place receivedPlace = null;
 
 
     public MapFragment() {
@@ -47,12 +49,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            receivedPlace = getArguments().getParcelable(BUNDLE_KEY);
-        }
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
     }
 
     @Override
@@ -63,11 +59,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             layoutView = inflater.inflate(R.layout.fragment_map, container, false);
             SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             supportMapFragment.getMapAsync(this);
-            //TODO: Test for MapView implementation instead of MapFragment
         } catch (Exception e){
-            Log.e("onCreateView","Error inflating map inner fragment. " + e.getMessage());
+            Log.e("onCreateView-MapFrag","Error inflating map inner fragment. " + e.getMessage());
         }
-
 
         return layoutView;
     }
@@ -84,6 +78,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Location mapLocation = null;
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.setBuildingsEnabled(false);
@@ -93,56 +88,61 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
 
-        if(ContextCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("onMapReady", "Map has permissions for location");
             mMap.setMyLocationEnabled(true);
-        }
-        if(receivedPlace != null) {
-            addPlaceMarker(receivedPlace);
-        }
-
-
-
-        /*
-        if(ContextCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("onMapReady-FragMap","Have location permission. Getting location");
-            getLocation();
-        }
-        if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION)){
-            //Explain to the user why we need to read the contacts
-            Snackbar.make(getView(), getString(R.string.snackbar_location_permissions_needed), Snackbar.LENGTH_INDEFINITE)
-                    .setAction(getString(R.string.snackbar_action_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
-                        }
-                    })
-                    .show();
+            LocationManager tempLocaManager = MainActivity.locationManager;
+            if (tempLocaManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Log.d("onMapReady", "GPS provider enabled. Getting LastKnownLocation");
+                mapLocation = tempLocaManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+            if (mapLocation == null) {
+                Log.d("onMapReady", "No LastKnownLocation for GPS Provider. Trying Passive...");
+                if (tempLocaManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
+                    mapLocation = tempLocaManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                }
+            }
+            if (mapLocation != null) {
+                setCurrentLocation(mapLocation);
+            } else {
+                Snackbar.make(getActivity().findViewById(R.id.main_content),"No Providers enabled",Snackbar.LENGTH_LONG).show();
+            }
         } else {
-            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+            String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.9142638");
+            String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "34.7861329");
+            mapLocation = new Location(getString(R.string.search_service_location_name));
+            mapLocation.setLatitude(Double.valueOf(latPref));
+            mapLocation.setLongitude(Double.valueOf(longtPref));
+            setCurrentLocation(mapLocation);
         }
-        */
-
     }
 
+    public void setCurrentLocation(@Nullable Location updatedLocation) {
+        if(updatedLocation != null){
+            Log.d("setCurrntLcatn-MapFrag", "Got location: " + updatedLocation.toString());
+            LatLng geoCoordinates = new LatLng(updatedLocation.getLatitude(),updatedLocation.getLongitude());
+            refreshMap(geoCoordinates);
 
+            if (currentLocationMarker != null) {
+                currentLocationMarker.remove();
+            }
 
-
-
-    public void setCurrentLocation(@Nullable LatLng updatedLocation) {
-        Log.d("setCurrntLcatn-MapFrag", "Got LatLng location");
-        if (currentLocationMarker != null) {
-            currentLocationMarker.remove();
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(geoCoordinates)
+                    .title(getString(R.string.marker_current_location))
+                    .alpha(0.7f)
+                    .icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
+                    );
+            Log.d("setCurLoc-MapFrag","Adding Marker");
+            currentLocationMarker = mMap.addMarker(markerOptions);
         }
-        refreshMap(updatedLocation);
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(updatedLocation)
-                .title(getString(R.string.marker_current_location))
-                .alpha(0.7f)
-                .icon(BitmapDescriptorFactory
-                        .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
-                );
-        Log.d("setCurLoc-MapFrag","Adding Marker");
-        currentLocationMarker = mMap.addMarker(markerOptions);
+    }
+    public static void refreshMap(@NonNull LatLng location) {
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(19).tilt(20).target(location).build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        mMap.moveCamera(cameraUpdate);
     }
 
     public void addPlaceMarker(@NonNull Place place) {
@@ -163,9 +163,5 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.addMarker(markerOptions);
     }
 
-    public static void refreshMap(@NonNull LatLng location) {
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(19).tilt(20).target(location).build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        mMap.moveCamera(cameraUpdate);
-    }
+
 }

@@ -35,7 +35,6 @@ import android.view.View;
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
-import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, SearchView.OnQueryTextListener {
 
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
         if (mapFrag != null) {
             Log.d("onLocChanged","Updating the location in the map fragment");
-            ((MapFragment)mapFrag).setCurrentLocation(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
+            ((MapFragment)mapFrag).setCurrentLocation(currentLocation);
         }
         SearchFragment searchFrag = (SearchFragment)((ViewPagerAdapter)viewPager.getAdapter()).getItem(searchFragId);
         if(searchFrag != null){
