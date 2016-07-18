@@ -144,6 +144,10 @@
     <string name="search_service_status_UNKNOWN_text">Got unnown error. Please try again.</string>
 
     <string name="search_service_intent_location_extra" translatable="false">LOC_ARR</string>
+    <string name="search_service_intent_location_name_extra" translatable="false">LOC_NAME</string>
+    <string name="search_service_intent_search_radius_m_extra" translatable="false">SERCH_RADIUS_M</string>
+
+
     <string name="search_service_location_name">You are here</string>
 
 

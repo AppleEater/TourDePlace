@@ -59,7 +59,7 @@ public class SearchFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(searchAdapter);
 
-        progressBar = (ProgressBar) container.findViewById(R.id.progressBar);
+        progressBar = (ProgressBar)searchFragLayout.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
 
         return searchFragLayout;

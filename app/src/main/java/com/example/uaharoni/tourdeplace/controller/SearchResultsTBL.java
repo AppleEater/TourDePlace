@@ -32,7 +32,6 @@ public class SearchResultsTBL extends PlacesDB {
                 + "," + COL_GPLACEID + TEXT_TYPE
                 + "," + COL_GPLACEICON_URL + TEXT_TYPE
                 + ")";
-        Log.d("onCreate", "Running command " + sqlCreateTable);
         try {
             Log.d("onCreate", "Running command " + sqlCreateTable);
             sqLiteDatabase.execSQL(sqlCreateTable);

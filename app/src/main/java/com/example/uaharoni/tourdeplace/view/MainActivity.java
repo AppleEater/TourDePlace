@@ -93,6 +93,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.removeUpdates(this);
         }
+        if(currentLocation != null){
+            Log.d("onPause","Saving last location to Prefs: ");
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            sharedPreferences.edit()
+                    .putString(getString(R.string.settings_last_location_latitude),String.valueOf(currentLocation.getLatitude()))
+                    .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLatitude()))
+                    .apply();
+        }
     }
 
     private void initReceivers(){
@@ -189,13 +197,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onLocationChanged(Location location) {
-        currentLocation = location;
         Log.d("onLocChange","Got Location " + location.toString());
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.edit()
-                .putString(getString(R.string.settings_last_location_latitude),String.valueOf(currentLocation.getLatitude()))
-                .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLatitude()))
-                .apply();
+        currentLocation = location;
 
         Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
         if (mapFrag != null) {
@@ -235,20 +238,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         return true;
     }
     private void searchGooglePlaces(){
+        int searchRadiusM = 0;
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
             Log.d("searchGooglePlaces","Internet permissions exist");
             getLocationUpdates();
-            if(currentLocation == null){
-                Log.d("searchGooglePlaces","No current location. Using from Preferences");
+            if(currentLocation == null) {
+                Log.d("searchGooglePlaces", "No current location. Using from Preferences");
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude),"32.0640349");
-                String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude),"34.7844082");
+                String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "32.0640349");
+                String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "34.7844082");
                 currentLocation = new Location(getString(R.string.search_service_location_name));
                 currentLocation.setLatitude(Double.parseDouble(latPref));
                 currentLocation.setLongitude(Double.parseDouble(longtPref));
             }
+
                 Intent serviceSearch = new Intent(this,com.example.uaharoni.tourdeplace.controller.SearchGplace.class);
                 serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),searchTerm);
+                serviceSearch.putExtra(getString(R.string.search_service_intent_search_radius_m_extra),String.valueOf(searchRadiusM));
+
+                serviceSearch.putExtra(getString(R.string.search_service_intent_location_name_extra),currentLocation.getProvider());
                 serviceSearch.putExtra(getString(R.string.search_service_intent_location_extra),new double[] {currentLocation.getLatitude(),currentLocation.getLongitude()});
                 Log.d("searchGooglePlaces","We have permissions. Starting the search service");
                 startService(serviceSearch);
