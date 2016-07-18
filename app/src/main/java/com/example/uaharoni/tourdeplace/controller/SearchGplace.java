@@ -3,7 +3,8 @@ package com.example.uaharoni.tourdeplace.controller;
 import android.app.IntentService;
 import android.content.Intent;
 import android.location.Location;
-import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -60,9 +61,8 @@ public class SearchGplace extends IntentService {
     protected void getPlacesList(String query,String radius,Location currentLocation){
         ArrayList<Place> placeArrayList = new ArrayList<>();
         //TODO: populate ArrayList with GooglePlaces list
-        String gplaceUrlString = buildUrl(currentLocation,radius,query).toString();
         try {
-            URL gplaceUrl = new URL(gplaceUrlString);
+            URL gplaceUrl = new URL(buildURL(currentLocation,radius,query));
             HttpURLConnection urlConnection = (HttpURLConnection) gplaceUrl.openConnection();
 
 
@@ -78,36 +78,28 @@ public class SearchGplace extends IntentService {
         }
         updateServiceStatus(getString(R.string.search_service_status_FINISHED));
     }
-
-    private Uri buildUrl(Location location, String searchRadius, String term) {
-        //sample: https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=restaurant&name=cruise&key=YOUR_API_KEY
-
-        final String JSON_RESPNOSE = "status";
-        final String JSON_RESPONSE_TYPE_TRUE = "OK";
-        final String JSON_SEARCH_ARRAY = "results";
-        final String JSON_PLACE_NAME = "name";
-        final String JSON_PLACE_ADDRESS_NAME = "vicinity";
-
-
+    private String buildURL(@NonNull Location location,@NonNull String searchRadius,@Nullable String searchTerm){
+        String url = null;
         String tempLocation = Double.toString(location.getLatitude()) + "," + Double.toString(location.getLongitude());
-        Log.d("buildUrl", "Location string: " + tempLocation);
+        if(searchTerm != null){
+             url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%s&radius=%s&language=%s&rankby=distance&keyword=%s&key=%s"
+                    ,tempLocation
+                    ,searchRadius
+                    ,Locale.getDefault().getLanguage()
+                    ,searchTerm
+                    ,getString(R.string.google_maps_key)
+            );
+        } else {
+            url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%s&radius=%s&language=%s&key=%s"
+                    ,tempLocation
+                    ,searchRadius
+                    ,Locale.getDefault().getLanguage()
+                    ,getString(R.string.google_maps_key)
+            );
+        }
 
-        Uri.Builder urlBuilder = new Uri.Builder().scheme("https")
-                .authority("maps.googleapis.com")
-                .appendPath("maps")
-                .appendPath("api")
-                .appendPath("place")
-                .appendPath("nearbysearch")
-                .appendPath("json")
-                .appendQueryParameter("location", tempLocation)
-                .appendQueryParameter("radius", searchRadius)
-                .appendQueryParameter("language", Locale.getDefault().getLanguage())
-                .appendQueryParameter("keyword", (term == null) ? "" : term)
-                .appendQueryParameter("key", getString(R.string.google_maps_key))
-//                .appendQueryParameter("pagetoken", (pagetoken == null) ? "" : pagetoken)
-                ;
-
-        Log.i("buildUrl", "Loading URI:" + urlBuilder.build().toString());
-        return urlBuilder.build();
+        Log.d("buildURL","URL Constructed: " + url);
+        return url;
     }
+
 }
