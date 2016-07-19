@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
@@ -32,8 +33,7 @@ public class SearchFragment extends Fragment {
     private SearchReceiver searchServiceReceiver;
     private static PlaceListAdapter searchAdapter;
     static ProgressBar progressBar;
-
-    private ShareActionProvider shareProvider;
+    private ShareActionProvider shareView;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -44,6 +44,7 @@ public class SearchFragment extends Fragment {
         super.onCreate(savedInstanceState);
         searchDbHelper = new SearchResultsTBL(getContext());
         searchServiceReceiver = new SearchReceiver();
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -106,14 +107,17 @@ public class SearchFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.share_place,menu);
-        shareProvider = (ShareActionProvider)menu.findItem(R.id.action_share);
+
+        MenuItem shareItem = menu.findItem(R.id.action_share);
+        shareView = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("onOptionsItemSelecd","Selected item " + item.toString());
         switch (item.getItemId()){
             case R.id.action_share:
-                doSharePlace((Place) item);
+                //TODO: Get the selected place
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -127,6 +131,6 @@ public class SearchFragment extends Fragment {
         intent.putExtra(getString(R.string.settings_last_location_latitude),place.getAddress().getAddLat());
         intent.putExtra(getString(R.string.settings_last_location_longitude),place.getAddress().getAddLong());
         intent.putExtra("PLACE_NAME",place.getName());
-        shareProvider.setShareIntent(intent);
+        shareView.setShareIntent(intent);
 }
 }

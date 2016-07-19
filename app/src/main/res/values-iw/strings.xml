@@ -9,7 +9,6 @@
     <string name="snackbar_action_ok">אשר</string>
     <string name="metric_system">ק״מ</string>
     <string name="british_system">מיילים</string>
-    <string name="action_search_title">חפש סביבי</string>
     <string name="search_hint">חדר כושר/ארומה/מסעדה</string>
     <string name="snackbar_message_power_connected">המכשיר מחובר למטען</string>
     <string name="snackbar_message_power_disconnected">המכשיר מנותק מהמטען</string>
@@ -47,4 +46,6 @@
     <string name="search_service_status_FINISHED_text">חיפוש מקומות הסתיים.</string>
     <string name="search_service_status_RUNNING_text">חיפוש מקומות מתבצע.</string>
     <string name="search_service_status_UNKNOWN_text">חיפוש מקומות נכשל. נסה שוב.</string>
+    <string name="action_search_any_title">הצג הכל סביבי</string>
+    <string name="action_search_business_title">הצג עסקים סביבי</string>
 </resources>

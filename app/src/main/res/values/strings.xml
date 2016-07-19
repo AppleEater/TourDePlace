@@ -2,7 +2,9 @@
     <string name="app_name">TourDePlace</string>
     <!-- Menu String -->
     <string name="action_settings">Settings</string>
-    <string name="action_search_title">Search Around</string>
+    <string name="action_search_business_title">Search business around</string>
+    <string name="action_search_any_title">Search business around</string>
+
     <string name="action_feedback">Feedback</string>
 
     <!-- Tab Strings -->

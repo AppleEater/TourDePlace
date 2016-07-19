@@ -1,6 +1,7 @@
 package com.example.uaharoni.tourdeplace.view;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,19 +25,21 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
 
-public class MainActivity extends AppCompatActivity implements LocationListener, SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements LocationListener, SearchView.OnQueryTextListener, RecyclerView.OnItemTouchListener {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -163,12 +166,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("onCreateMenu","Loading menu");
         getMenuInflater().inflate(R.menu.options_menu, menu);
 
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        MenuItem searchBusiness = menu.findItem(R.id .action_search_business);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchBusiness);
         searchView.setIconifiedByDefault(false);
         searchView.setInputType(InputType.TYPE_CLASS_TEXT);
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setOnQueryTextListener(this);
+
+        MenuItem searchAny = menu.findItem(R.id .action_search_any);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -178,18 +183,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("onItemSelected","Selected Menu Option " + item.getTitle());
         switch (item.getItemId()){
             case R.id.action_settings:
-                //View settingsView = findViewById(R.id.settingsContainer);
-                //settingsView.setBackgroundColor(R.attr.colorPrimary);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.settingsContainer, new SettingsFragment())
                         .addToBackStack(getString(R.string.action_settings))
                         .commit();
                 return true;
-
+            case R.id.action_search_any:
+                searchGooglePlaces(null);
+                return true;
             case R.id.action_feedback:
                 return true;
             default:
-                // If we got here, the user's action was not recognized. Invoke the superclass to handle it.
+                Log.d("onItemSelected","Can't find action. going to superclass");
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -225,19 +230,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public boolean onQueryTextSubmit(String query) {
         searchView.clearFocus();
         Log.d("onQuerySubmit","Query string: " + query);
-        searchTerm = query.trim();
         viewPager.setCurrentItem(0);
+        searchGooglePlaces(query.trim());
 
+        /*
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d("onQueryTextSubmit","Permissions are granted. This means we're either on API<23 or not a first run");
-            searchGooglePlaces();
+            searchGooglePlaces(query.trim());
         } else {
+            searchTerm = query.trim();
             getLocationPermissions();
         }
+        */
+
         return true;
     }
-    private void searchGooglePlaces(){
+    private void searchGooglePlaces(String searchTerm){
         long searchRadiusM = 0;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            getLocationPermissions();
+        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
             Log.d("searchGooglePlaces","Internet permissions exist. Getting locationUpdates");
             getLocationUpdates();
@@ -292,7 +305,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 Log.d("getLocation", "High access providers exist. Getting currentLocation");
                 locationManager.requestLocationUpdates(locProvHigh.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
                 currentLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
-                Log.d("getLocation","Current location is " + currentLocation.toString());
+                if(currentLocation != null){
+                    Log.d("getLocation","Current location is " + currentLocation.toString());
+                }
             }
         }
     }
@@ -323,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             case LOCATION_REQUEST_CODE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d("RequestPerms", "Permission granted. Running");
-                    searchGooglePlaces();
+                    searchGooglePlaces(searchTerm);
                 } else {
                     Log.d("RequestPerms", "Location Permissions denied on API>=23");
                     Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_no_location_permissions),Snackbar.LENGTH_LONG).show();
@@ -332,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             case INTERNET_REQUEST_CODE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d("RequestPerms","Internet permission granted.");
-                    searchGooglePlaces();
+                    searchGooglePlaces(searchTerm);
                 } else {
                     Log.d("RequestPerms","Internet permissions denied");
                 }
@@ -347,5 +362,43 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d("onTouchEvent","Got event " + event.toString());
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            toggleActionBar();
+        }
+        return true;
+    }
+
+    private void toggleActionBar() {
+        ActionBar actionBar = getActionBar();
+
+        if(actionBar != null) {
+            if(actionBar.isShowing()) {
+                Log.d("toggleActionBar","Hiding the actionBar");
+                actionBar.hide();
+            }
+            else {
+                Log.d("toggleActionBar","Showing the actionBar");
+                actionBar.show();
+            }
+        }
     }
 }

@@ -6,12 +6,17 @@
     tools:context="com.example.uaharoni.tourdePlace.view.MainActivity"
     >
 
-    <item android:id="@+id/action_search"
-        android:title="@string/action_search_title"
+    <item android:id="@+id/action_search_business"
+        android:title="@string/action_search_business_title"
         android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="collapseActionView|ifRoom"
+        app:showAsAction="collapseActionView|ifRoom|withText"
         app:actionViewClass="android.support.v7.widget.SearchView" />
 
+    <item android:id="@+id/action_search_any"
+        android:title="@string/action_search_any_title"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        app:showAsAction="collapseActionView|ifRoom|withText"
+         />
 
     <item
         android:id="@+id/action_settings"
