@@ -11,7 +11,12 @@ import android.util.Log;
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.model.Place;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,7 +35,6 @@ public class SearchGplace extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG, "Service Started.");
         if (intent != null) {
-            //TODO: Check if the values order is relevant
             final String searchTerm = intent.getStringExtra(getString(R.string.search_service_intent_query_extra));
             final String searchRadiusM = intent.getStringExtra(getString(R.string.search_service_intent_search_radius_m_extra));
             String locationName = intent.getStringExtra(getString(R.string.search_service_intent_location_name_extra));
@@ -58,18 +62,19 @@ public class SearchGplace extends IntentService {
         Log.d(TAG,"Broadcasting the intent with status " + status);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
-    protected void getPlacesList(String query,String radius,Location currentLocation){
+    protected void getPlacesList(@Nullable String query,@NonNull String radius,@NonNull Location currentLocation){
+        Log.d("getPlacesList","Starting...");
         ArrayList<Place> placeArrayList = new ArrayList<>();
         //TODO: populate ArrayList with GooglePlaces list
         try {
             URL gplaceUrl = new URL(buildURL(currentLocation,radius,query));
-            HttpURLConnection urlConnection = (HttpURLConnection) gplaceUrl.openConnection();
-
+            HttpURLConnection connection = getConnection(gplaceUrl);
+            JSONObject jsResponse = getJSON(connection);
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            Log.d("getPlacesList", " Error in URL. " + e.getMessage());
+        } catch (IOException ei) {
+            Log.d("getPlacesList","Error obtaining JSON object. " + ei.getMessage());
         }
 
         SearchResultsTBL searchDbHelper = new SearchResultsTBL(this);
@@ -82,24 +87,64 @@ public class SearchGplace extends IntentService {
         String url = null;
         String tempLocation = Double.toString(location.getLatitude()) + "," + Double.toString(location.getLongitude());
         if(searchTerm != null){
-             url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%s&radius=%s&language=%s&rankby=distance&keyword=%s&key=%s"
+             url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%s&radius=%s&key=%s&keyword=%s&language=%s"
                     ,tempLocation
                     ,searchRadius
-                    ,Locale.getDefault().getLanguage()
-                    ,searchTerm
-                    ,getString(R.string.google_maps_key)
+                     ,getString(R.string.google_maps_key)
+                     ,searchTerm
+                     , Locale.getDefault().getLanguage()
             );
+
         } else {
-            url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%s&radius=%s&language=%s&key=%s"
+            url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%s&radius=%s&key=%s&language=%s"
                     ,tempLocation
                     ,searchRadius
-                    ,Locale.getDefault().getLanguage()
                     ,getString(R.string.google_maps_key)
+                    ,Locale.getDefault().getLanguage()
             );
         }
 
         Log.d("buildURL","URL Constructed: " + url);
         return url;
     }
+    private HttpURLConnection getConnection(URL url){
+        Log.i("getConnection","Connecting to URL: " + url.toString());
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            if(connection.getResponseCode()  != HttpURLConnection.HTTP_OK){
+                Log.e("getConnection","Bad HTTP message");
+            }
+        } catch (IOException e) {
+            Log.e("getConnection","Can't connect." + e.getMessage());
+        }
+        return connection;
+    }
+    private JSONObject getJSON(HttpURLConnection connection){
+        JSONObject movieJson = null,jsonResponse = null;
+        String inputLine="", resultResponse="";
+
+        Log.i("getJSON","Reading the response from the URL");
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            while ((inputLine = reader.readLine()) != null) {
+                resultResponse += inputLine;
+            }
+            jsonResponse = new JSONObject(resultResponse);
+            if(jsonResponse.getString("Response").equals("True")){
+                Log.i("getJSON","Found movie object " + jsonResponse.getString("Title"));
+                movieJson = jsonResponse;
+            } else {
+                Log.i("getJSON","JSON object returned no movie." + jsonResponse.getString("Error"));
+            }
+        } catch (IOException e) {
+            Log.w("getJSON","Input Stream not opened. " + e.getMessage());
+        } catch (JSONException je) {
+            Log.e("getJSON","No JSON object obtained. " + je.getMessage());
+        }
+        return movieJson;
+    }
+
 
 }

@@ -1,17 +1,12 @@
 package com.example.uaharoni.tourdeplace.view;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -31,7 +26,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -77,8 +71,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d("onMapReady", "Map successfully loaded");
         mMap = googleMap;
         Location mapLocation = null;
 
@@ -90,9 +86,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
 
+        setCurrentLocation(MainActivity.currentLocation);
+
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d("onMapReady", "Map has permissions for location");
             mMap.setMyLocationEnabled(true);
+        }
+        /*
+
             LocationManager tempLocaManager = MainActivity.locationManager;
             if (tempLocaManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Log.d("onMapReady", "GPS provider enabled. Getting LastKnownLocation");
@@ -127,33 +128,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mapLocation.setLongitude(Double.valueOf(longtPref));
             setCurrentLocation(mapLocation);
         }
+        */
     }
 
     public void setCurrentLocation(@Nullable Location updatedLocation) {
         if(updatedLocation != null){
-            Log.d("setCurrntLcatn-MapFrag", "Got location: " + updatedLocation.toString());
+            Log.d("setCurrntLcatn-MapFrag", "Moving to location: " + updatedLocation.toString());
             LatLng geoCoordinates = new LatLng(updatedLocation.getLatitude(),updatedLocation.getLongitude());
             refreshMap(geoCoordinates);
 
             if (currentLocationMarker != null) {
                 currentLocationMarker.remove();
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(geoCoordinates)
+                        .title(getString(R.string.marker_current_location))
+                        .alpha(0.7f)
+                        .icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
+                        );
+                if(mMap != null){
+                    Log.d("setCurLoc-MapFrag","Adding Marker");
+                    currentLocationMarker = mMap.addMarker(markerOptions);
+                }
+
             }
 
-            MarkerOptions markerOptions = new MarkerOptions()
-                    .position(geoCoordinates)
-                    .title(getString(R.string.marker_current_location))
-                    .alpha(0.7f)
-                    .icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
-                    );
-            Log.d("setCurLoc-MapFrag","Adding Marker");
-            currentLocationMarker = mMap.addMarker(markerOptions);
         }
     }
-    public static void refreshMap(@NonNull LatLng location) {
+    public void refreshMap(@NonNull LatLng location) {
         CameraPosition cameraPosition = new CameraPosition.Builder().zoom(19).tilt(20).target(location).build();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        mMap.moveCamera(cameraUpdate);
+        if(mMap != null){
+            Log.d("refreshMap","Moving the map to a new location: " + location.toString());
+            mMap.moveCamera(cameraUpdate);
+        }
     }
 
     public void addPlaceMarker(@NonNull Place place) {
@@ -171,7 +179,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .snippet(address)
                 .icon(BitmapDescriptorFactory.fromPath("https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"));
         // the icon is expermiental
-        mMap.addMarker(markerOptions);
+        if(mMap != null){
+            mMap.addMarker(markerOptions);
+        }
     }
 
 
