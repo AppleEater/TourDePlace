@@ -75,15 +75,15 @@ public class FavsTBL extends PlacesDB {
         String gPlaceId = cursor.getString((id_gplaceID!=-1)?id_gplaceID:null);
         String gPlaceIconUrl = cursor.getString((id_gPlaceIcon!=-1)?id_gPlaceIcon:null);
 
-
-        return (new Place(
+        Place returnPlace = new Place(
                 placeName
                 ,new Address(placeAddress,placeAddress_lat,placeAddress_long)
-                ,placeId
                 ,gPlaceId
                 ,gPlaceIconUrl
-        )
         );
+        returnPlace.setId(placeId);
+
+        return returnPlace;
     }
     @Override
     protected ContentValues extractPlace(@NonNull Place place) {

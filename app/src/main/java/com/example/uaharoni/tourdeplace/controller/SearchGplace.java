@@ -113,7 +113,6 @@ public class SearchGplace extends IntentService {
             place = new Place(
                         item.getString("name")
                         ,getPlaceAddress(item)
-                        , (long) 0
                     ,item.getString("place_id")
                         ,item.getString("icon")
                     );

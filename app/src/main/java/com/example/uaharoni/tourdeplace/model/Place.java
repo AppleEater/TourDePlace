@@ -9,6 +9,7 @@ public class Place implements Parcelable {
     private Long id; // used for DB saving
     private String gPlaceId;    //Google PlaceID
     private String placeIconUrl;    // maps to "icon" in the gPlace API
+    private float placeRating;
     private PlacePhoto[] placePhotos;
 
     public Place(String name, Address address, Long id) {
@@ -17,7 +18,7 @@ public class Place implements Parcelable {
         this.id = id;
     }
 
-    public Place(String name, Address address, Long id, String gPlaceId, String placeIconUrl) {
+    public Place(String name, Address address, String gPlaceId, String placeIconUrl) {
         this.name = name;
         this.address = address;
         this.id = id;
@@ -95,6 +96,15 @@ public class Place implements Parcelable {
     public void setPlaceIconUrl(String placeIconUrl) {
         this.placeIconUrl = placeIconUrl;
     }
+
+    public float getPlaceRating() {
+        return placeRating;
+    }
+
+    public void setPlaceRating(float placeRating) {
+        this.placeRating = placeRating;
+    }
+
     public PlacePhoto[] getPlacePhotos() {
         return placePhotos;
     }

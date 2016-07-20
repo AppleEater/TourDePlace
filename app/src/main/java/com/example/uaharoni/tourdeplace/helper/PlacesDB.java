@@ -36,8 +36,9 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
     public static final String COL_ADD_NAME = "add_name";
     public static final String COL_GPLACEID = "gplace_id";
     public static final String COL_GPLACEICON_URL = "gplace_icon_url";
+    public static final String COL_RATING = "rating";
 
-    // Logcat tag
+
     public static final String LOG = "placesDbHelper";
 
     public PlacesDB(Context context) {
@@ -51,8 +52,6 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
         Log.d("deleteTBL-PlaceDB","Deleting table " + tblName);
         try {
             SQLiteDatabase db = this.getWritableDatabase();
-           // String sqlFormat = String.format("DROP TABLE IF EXISTS %s", tblName);
-          //  db.execSQL(sqlFormat);
             db.delete(tblName,null,null);
             db.close();
         } catch (Exception e) {
