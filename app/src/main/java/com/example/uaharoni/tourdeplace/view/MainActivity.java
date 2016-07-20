@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             Log.d("onPause","Saving last location to Prefs: ");
             sharedPreferences.edit()
                     .putString(getString(R.string.settings_last_location_latitude),String.valueOf(currentLocation.getLatitude()))
-                    .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLatitude()))
+                    .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLongitude()))
                     .apply();
         }
     }

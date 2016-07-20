@@ -143,7 +143,7 @@
     <string name="search_service_status_RUNNING_text">Search is running. Please wait.</string>
     <string name="search_service_status_FINISHED_text">Search finished!</string>
     <string name="search_service_status_ERROR_text">Search got errors and stopped. Please try again..</string>
-    <string name="search_service_status_UNKNOWN_text">Got unnown error. Please try again.</string>
+    <string name="search_service_status_UNKNOWN_text">Got unknown error. Please try again.</string>
 
     <string name="search_service_intent_location_extra" translatable="false">LOC_ARR</string>
     <string name="search_service_intent_location_name_extra" translatable="false">LOC_NAME</string>

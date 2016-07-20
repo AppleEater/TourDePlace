@@ -1,10 +1,10 @@
 package com.example.uaharoni.tourdeplace.model;
 
 public class Address {
-    private Long addLat, addLong;   // mapped under geometry/location in gPlaces API
+    private double addLat, addLong;   // mapped under geometry/location in gPlaces API
     private String name;    //mapped as: vicinity in gPlaces API
 
-    public Address(String name, Long addLat, Long addLong) {
+    public Address(String name, double addLat, double addLong) {
         this.name = name;
         this.addLat = addLat;
         this.addLong = addLong;
@@ -18,19 +18,19 @@ public class Address {
         this.name = name;
     }
 
-    public Long getAddLong() {
+    public double getAddLong() {
         return addLong;
     }
 
-    public void setAddLong(Long addLong) {
+    public void setAddLong(double addLong) {
         this.addLong = addLong;
     }
 
-    public Long getAddLat() {
+    public double getAddLat() {
         return addLat;
     }
 
-    public void setAddLat(Long addLat) {
+    public void setAddLat(double addLat) {
         this.addLat = addLat;
     }
 }

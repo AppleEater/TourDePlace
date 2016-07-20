@@ -44,6 +44,9 @@ public class SearchReceiver extends BroadcastReceiver {
                 intentSnack.putExtra(context.getString(R.string.snackbar_message_custom_intent_extra_text),message);
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intentSnack);
                 SearchFragment.updateProgressBar(Integer.parseInt(serviceStatus));
+                if(Integer.parseInt(serviceStatus)==1){
+                    Log.d("onReceive", "Time to refresh the adapter");
+                }
             }
         }
     }

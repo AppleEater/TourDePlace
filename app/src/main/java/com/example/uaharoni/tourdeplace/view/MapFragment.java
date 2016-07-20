@@ -1,7 +1,6 @@
 package com.example.uaharoni.tourdeplace.view;
 
 import android.Manifest;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -32,7 +31,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static GoogleMap mMap;
     private final int LOCATION_REQUEST_CODE = 1;
     private final int PROVIDER_DISABLED_REQUEST_CODE = 2;
-    private SharedPreferences sharedPreferences;
 
     public static final String BUNDLE_KEY = "PLACE";
     private static Marker currentLocationMarker;

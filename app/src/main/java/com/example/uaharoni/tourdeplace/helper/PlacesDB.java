@@ -51,8 +51,9 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
         Log.d("deleteTBL-PlaceDB","Deleting table " + tblName);
         try {
             SQLiteDatabase db = this.getWritableDatabase();
-            String sqlFormat = String.format("DROP TABLE IF EXISTS %s", tblName);
-            db.execSQL(sqlFormat);
+           // String sqlFormat = String.format("DROP TABLE IF EXISTS %s", tblName);
+          //  db.execSQL(sqlFormat);
+            db.delete(tblName,null,null);
             db.close();
         } catch (Exception e) {
             Log.e("deleteTBL-PlaceDB", "Failed to delete table " + tblName + ". " + e.getMessage());

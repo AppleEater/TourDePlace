@@ -30,8 +30,7 @@ public class Place implements Parcelable {
         parcel.writeString(this.getgPlaceId());
         parcel.writeString(this.getPlaceIconUrl());
         parcel.writeString(this.getAddress().getName());
-        parcel.writeLong(this.getAddress().getAddLat());
-        parcel.writeLong(this.getAddress().getAddLong());
+        parcel.writeDoubleArray(new double[]{this.getAddress().getAddLat(),this.getAddress().getAddLong()});
     }
 
     protected Place(Parcel in) {
@@ -39,8 +38,10 @@ public class Place implements Parcelable {
         gPlaceId = in.readString();
         placeIconUrl = in.readString();
         this.address.setName(in.readString());
-        this.address.setAddLat(in.readLong());
-        this.address.setAddLong(in.readLong());
+        double[] addCoordinates = new double[2];
+        in.readDoubleArray(addCoordinates);
+        this.address.setAddLat(addCoordinates[0]);
+        this.address.setAddLong(addCoordinates[1]);
     }
 
     public static final Creator<Place> CREATOR = new Creator<Place>() {

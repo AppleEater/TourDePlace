@@ -71,6 +71,7 @@ public class SearchFragment extends Fragment {
         super.onResume();
         Log.d("onResumeSearchFrag","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
         LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
+        searchAdapter.notifyDataSetChanged();
     }
 
     @Override
