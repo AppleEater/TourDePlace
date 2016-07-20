@@ -132,7 +132,7 @@ public class SearchGplace extends IntentService {
             double addLat = locationInfo.getDouble("lat");
             double addLong = locationInfo.getDouble("lng");
             newAddress = new Address(addName,addLat,addLong);
-            Log.d("getPlaceAddress","Place Address: " + newAddress.toString());
+            //Log.d("getPlaceAddress","Place Address: " + newAddress.toString());
         } catch (JSONException e) {
             Log.d("getPlaceAddress","Error parsing geometry array. " + e.getMessage());
         }
