@@ -30,8 +30,8 @@
 
     <string name="settings_distance_units_key" translatable="false">DISTANCE_UNITS</string>
     <string name="settings_distance_units_title">Display distance in</string>
-    <string name="metric_system">Kilometers</string>
-    <string name="british_system">Miles</string>
+    <string name="unit_system_km_value">Kilometers</string>
+    <string name="unit_system_mi_value">Miles</string>
     <string name="unit_system_km" translatable="false">KM</string>
     <string name="unit_system_mi" translatable="false">MI</string>
 

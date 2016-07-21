@@ -2,95 +2,73 @@ package com.example.uaharoni.tourdeplace.view;
 
 import android.content.Context;
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.uaharoni.tourdeplace.R;
-import com.example.uaharoni.tourdeplace.controller.OnViewHolderClickListener;
 import com.example.uaharoni.tourdeplace.model.Place;
+import com.squareup.picasso.Picasso;
 
-public class PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+public class PlaceViewHolder extends RecyclerView.ViewHolder {
 
-    private Place place;
-    private Context context;
     private TextView txtPlaceName, txtPlaceAddress, txtPlaceDistance;
-    private String placeName, placeAddress;
-    private double placeAddLat, placeAddLong;
+    private RatingBar rbPlaceRating;
     private ImageView iVPlaceImage;
+    private Context context;
+    private Place place;
+    private Location curPlace;
 
-    private OnViewHolderClickListener mCallback;
-
-    public PlaceViewHolder(View itemView) {
+    public PlaceViewHolder(@NonNull View itemView) {
         super(itemView);
-        Log.d("PlaceViewHolder", "Got item " + getItemId() + " on view " + getItemViewType());
 
-        txtPlaceName = (TextView) itemView.findViewById(0);
-        txtPlaceAddress = (TextView) itemView.findViewById(0);
-        iVPlaceImage = (ImageView) itemView.findViewById(0);
-        txtPlaceDistance = (TextView) itemView.findViewById(0);
+        txtPlaceName = (TextView) itemView.findViewById(R.id.txtPlaceName);
+        txtPlaceAddress = (TextView) itemView.findViewById(R.id.txtPlaceAddress);
+        iVPlaceImage = (ImageView) itemView.findViewById(R.id.iv_placeIcon);
+        txtPlaceDistance = (TextView) itemView.findViewById(R.id.txtPlaceDistance);
+        rbPlaceRating = (RatingBar)itemView.findViewById(R.id.rb_placeRating);
 
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        context = itemView.getContext().getApplicationContext();
     }
 
-    public void bindPlaceView(Context context, Place place, String unitSystem, Location currentLocation) {
-        this.context = context;
-        this.place = place;
-        placeName = place.getName();
-        placeAddress = place.getAddress().getName();
-        placeAddLat = place.getAddress().getAddLat();
-        placeAddLong = place.getAddress().getAddLong();
+    public void bind(@NonNull Place remotePlace,String distance){
+        txtPlaceName.setText(remotePlace.getName());
+        txtPlaceAddress.setText(remotePlace.getAddress().getName());
+        txtPlaceDistance.setText(getDistanceString(remotePlace,distance));
 
-        txtPlaceName.setText(placeName);
-        txtPlaceAddress.setText(placeAddress);
-
-        float distanceValue = getLocalizedDistance(placeAddLat, placeAddLong, unitSystem,currentLocation);
-        String textDistance = String.valueOf(distanceValue);
-        textDistance = textDistance.concat(unitSystem);
-        txtPlaceDistance.setText("" + textDistance);  //TODO: Fix with variables in Resource string
-        ;
+        if(rbPlaceRating != null){
+            rbPlaceRating.setRating(remotePlace.getPlaceRating());
+        }
         if (iVPlaceImage != null) {
-            iVPlaceImage.setImageBitmap(null);  // TODO: fix dummy code with picasso
+            Picasso.with(context)
+                    .load(remotePlace.getPlaceIconUrl())
+                    .placeholder(android.R.drawable.ic_menu_upload_you_tube)
+                    .into(iVPlaceImage);
         }
     }
-    private float getLocalizedDistance(double destLat, double destLong, String unitSystem, Location homeLocation) {
-        String TAG = "getLocalizedDistance";
-        float distanceLocalized;
-        Log.d(TAG,"Got info in " + unitSystem);
-        Location remotePlace = new Location(txtPlaceName.getText().toString());
-        remotePlace.setLatitude(destLat);
-        remotePlace.setLongitude(destLong);
-
-        /*
-        Location localPlace = new Location("Current");
-        localPlace.setLatitude(homeLocation.latitude);
-        localPlace.setLongitude(homeLocation.longitude);
-        */
-        float distanceMeters = homeLocation.distanceTo(remotePlace);
-        //TODO: Implement Google Maps Direction API (https://developers.google.com/maps/documentation/directions/)
-        if(unitSystem.equals((String)context.getString(R.string.unit_system_km))){
-            distanceLocalized = distanceMeters / 1000f;   // distance in km
-        } else {
-            distanceLocalized = distanceMeters / 1609.344f; // distance in miles
-        }
-        Log.d(TAG,"Calculated distance: " + distanceLocalized + " " + unitSystem );
-        return distanceLocalized;
+private String getDistanceString(Place remotePlace,String distanceUnit){
+    String distanceLocalized=null;
+    String distanceString;
+    Location homeLocation = MainActivity.currentLocation;
+    Location remoteLocation = new Location(remotePlace.getName());
+    remoteLocation.setLatitude(remotePlace.getAddress().getAddLat());
+    remoteLocation.setLongitude(remotePlace.getAddress().getAddLong());
+    float distanceMeters = homeLocation.distanceTo(remoteLocation);
+    //TODO: Implement Google Maps Direction API (https://developers.google.com/maps/documentation/directions/)
+    if(distanceUnit.equals(context.getString(R.string.unit_system_km))){
+        distanceLocalized = Float.toString(distanceMeters / 1000);
+        distanceString = context.getString(R.string.unit_system_km_value);
+    } else {
+        distanceLocalized = Float.toString(distanceMeters / 1609.344f);
+        distanceString = context.getString(R.string.unit_system_mi_value);
     }
+    distanceLocalized = distanceLocalized.concat(" " + distanceString);
+    Log.d("getDistanceString","Calculated distance: " + distanceLocalized );
 
-    @Override
-    public void onClick(View view) {
-        Log.d("onClick", "Clicked on item " + view.getId());
-        // Send the event to the host activity
-        mCallback.onPlaceItemSelected(this.place);
+    return distanceLocalized;
     }
-
-    @Override
-    public boolean onLongClick(View view) {
-        Log.d("onLongClick", "Will share " + view.getRootView().toString());
-        return true;
-    }
-
 }

@@ -116,7 +116,11 @@ public class SearchGplace extends IntentService {
                     ,item.getString("place_id")
                         ,item.getString("icon")
                     );
-            //TODO: Add rating based on "rating" string. numeric values
+            if(item.isNull("rating")){
+                Log.d("getItem", "No rating");
+            } else {
+                place.setPlaceRating(item.getLong("rating"));
+            }
         } catch (JSONException e) {
             Log.d("getItem","Error parsing JSON item. " + e.getMessage());
         }

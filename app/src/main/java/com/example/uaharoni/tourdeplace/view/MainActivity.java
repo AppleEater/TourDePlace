@@ -245,15 +245,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         viewPager.setCurrentItem(0);
         searchGooglePlaces();
 
-        /*
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("onQueryTextSubmit","Permissions are granted. This means we're either on API<23 or not a first run");
-            searchGooglePlaces(query.trim());
-        } else {
-            searchTerm = query.trim();
-            getLocationPermissions();
-        }
-        */
 
         return true;
     }

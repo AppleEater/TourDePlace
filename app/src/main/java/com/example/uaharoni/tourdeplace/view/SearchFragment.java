@@ -31,7 +31,7 @@ public class SearchFragment extends Fragment {
 
     private SearchResultsTBL searchDbHelper;
     private SearchReceiver searchServiceReceiver;
-    private static PlaceListAdapter searchAdapter;
+   // private PlaceListAdapter searchAdapter;
     static ProgressBar progressBar;
     private ShareActionProvider shareView;
 
@@ -49,14 +49,13 @@ public class SearchFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("onCreateViewSearchFrag","Inflating View");
+        Log.d("SearchFrag","Inflating View");
         // Inflate the layout for this fragment
         View searchFragLayout = inflater.inflate(R.layout.fragment_search, container, false);
 
+        PlaceListAdapter searchAdapter  = new PlaceListAdapter(searchDbHelper.getAllPlaces(),R.id.rv_search);
 
         RecyclerView recyclerView = (RecyclerView) searchFragLayout.findViewById(R.id.rv_search);
-        searchAdapter = new PlaceListAdapter(searchDbHelper.getAllPlaces(),R.id.rv_search);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(searchAdapter);
 
@@ -69,15 +68,14 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("onResumeSearchFrag","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
+        Log.d("SearchFrag","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
         LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
-        searchAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("onPauseSearchFrag","Removing receivers");
+        Log.d("SearchFrag","Removing receivers");
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchServiceReceiver);
     }
     public static void updateProgressBar(int statusCde) {
@@ -91,7 +89,6 @@ public class SearchFragment extends Fragment {
             case 2:
                 progressBar.setVisibility(View.GONE);
         }
-        searchAdapter.notifyDataSetChanged();
     }
 
     @Override
