@@ -62,6 +62,7 @@ public class SearchFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
+
         progressBar = (ProgressBar) searchFragLayout.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
 
@@ -100,9 +101,9 @@ public class SearchFragment extends Fragment {
     }
 
     public void refreshAdapter() {
-        Log.d("refreshAdapter", "Refreshing RecyclerView adapter...");
-        searchAdapter.notifyDataSetChanged();
-        recyclerView.invalidate();
+        Log.d("refreshAdapter", "Refreshing RecyclerView adapter...");;
+        searchAdapter = new PlacesAdapter(getContext(), searchDbHelper.getAllPlaces());
+        recyclerView.setAdapter(searchAdapter);
     }
 
     @Override
