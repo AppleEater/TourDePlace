@@ -88,18 +88,18 @@ public class LocationHelper {
         c.setPowerRequirement(Criteria.POWER_HIGH);
         return c;
     }
-    public long getRadiusinM(@NonNull String searchRadius){
-        long radius = 0;
+    public long getRadiusinM(@NonNull String length){
+        long lengthMeters = 0;
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String distanceUnit = sp.getString(context.getString(R.string.settings_distance_units_key),context.getString(R.string.unit_system_km));
         if(distanceUnit.equals(context.getString(R.string.unit_system_km))){
-            radius = (long)(Double.parseDouble(searchRadius)*1000); //distance in Meters
+            lengthMeters = (long)(Double.parseDouble(length)*1000); //distance in Meters
         } else {
             // Assuming distance is in Miles
-            radius = (long)(Double.parseDouble(searchRadius)*1609.344);
+            lengthMeters = (long)(Double.parseDouble(length)*1609.344);
         }
-        Log.d("getRaiusinM","Converted " + searchRadius + " " + distanceUnit + " to " + radius + " meters");
-        return radius;
+        Log.d("getRaiusinM","Converted " + length + " " + distanceUnit + " to " + lengthMeters + " meters");
+        return lengthMeters;
     }
 
 }

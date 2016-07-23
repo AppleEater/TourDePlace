@@ -78,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         initToolBar();
         initTabs();
 
+        viewPager.setCurrentItem(favFragId);
+
+
         Log.d("onCreate-Main","Finished onCreate");
     }
 
@@ -87,7 +90,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("onResume-Main","onResume started.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
 
-        if(currentLocation == null) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //currentLocation = getLocationUpdates();
+        }
+
+            if(currentLocation == null) {
             Log.d("onResume-Main", "No current location. Using from Preferences");
             String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
             String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
@@ -184,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setOnQueryTextListener(this);
 
-        MenuItem searchAny = menu.findItem(R.id .action_search_any);
+        //MenuItem searchAny = menu.findItem(R.id .action_search_any);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -200,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                         .commit();
                 return true;
             case R.id.action_search_any:
+                viewPager.setCurrentItem(searchFragId);
                 searchGooglePlaces();
                 return true;
             case R.id.action_feedback:
@@ -242,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         searchTerm = query.trim();
         searchView.clearFocus();
         Log.d("onQuerySubmit","Query string: " + query);
-        viewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(searchFragId);
         searchGooglePlaces();
 
 

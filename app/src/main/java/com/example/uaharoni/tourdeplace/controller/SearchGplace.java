@@ -78,12 +78,25 @@ public class SearchGplace extends IntentService {
                 Log.d("getPlacesList","Parsing the JSON object");
                 JSONArray results = jsResponse.getJSONArray("results");
                 Log.d("getPlacesList","results array has " + results.length() + " items.");
+                boolean skip;
                 for (int i = 0; i <results.length() ; i++) {
+                    skip = false;
                     JSONObject item = results.getJSONObject(i);
                     String permanentlyClosed = item.has("permanently_closed") ? item.getString("permanently_closed") : null;
                     if(permanentlyClosed != null && permanentlyClosed.equals("true")) {
                         Log.d("getPlacesList", "Place[" + i + "] is permanently closed. Ignoring...");
-                    } else {
+                        skip = true;
+                    }
+                    JSONArray placeTypes = item.getJSONArray("types");
+                    String[] types = new String[placeTypes.length()];
+                    for (int j = 0; j < types.length; j++) {
+                        types[j] = placeTypes.getString(j);
+                        if(types[j].equals("political") || types[j].equals("bus_station") || types[j].equals("parking")) {
+                            Log.d("getPlacesList", "Place[" + i + "] is type " + types[j] + ". Ignoring...");
+                            skip=true;
+                        }
+                    }
+                    if(!skip){
                         Place itemPlace = getItem(item);
                         placeArrayList.add(itemPlace);
                     }
@@ -97,13 +110,14 @@ public class SearchGplace extends IntentService {
         }
 
         if(placeArrayList.size()>0){
-            SearchResultsTBL searchDbHelper = new SearchResultsTBL(this);
+            SearchResultsTBL searchDbHelper = new SearchResultsTBL(getApplicationContext());
             Log.d("getPlacesList", "Deleting searchResults table.");
             searchDbHelper.deleteTBL();
             Log.d("getPlacesList", "Inserting new results to SearchResults table.");
             for (int i = 0; i < placeArrayList.size() ; i++) {
                 searchDbHelper.insertPlace(placeArrayList.get(i));
             }
+            searchDbHelper.close();
         }
  updateServiceStatus(getString(R.string.search_service_status_FINISHED));
     }
@@ -117,7 +131,7 @@ public class SearchGplace extends IntentService {
                         ,item.getString("icon")
                     );
             if(item.isNull("rating")){
-                Log.d("getItem", "No rating");
+                Log.d("getItem", "No rating for item " + item.getString("name") + "[" + item.get("place_id") + "]");
             } else {
                 place.setPlaceRating(item.getLong("rating"));
             }
@@ -128,14 +142,15 @@ public class SearchGplace extends IntentService {
     }
     private Address getPlaceAddress(JSONObject item){
         Address newAddress = null;
+        String addName = null;
         try {
-            String addName = item.getString("vicinity");
+            addName = item.getString("vicinity");
             JSONObject geometry = item.getJSONObject("geometry");
             JSONObject locationInfo = geometry.getJSONObject("location");
             double addLat = locationInfo.getDouble("lat");
             double addLong = locationInfo.getDouble("lng");
             newAddress = new Address(addName,addLat,addLong);
-            //Log.d("getPlaceAddress","Place Address: " + newAddress.toString());
+            Log.d("getPlaceAddress","Place Address: " + addName + "[" + addLat + "," + addLong +"]");
         } catch (JSONException e) {
             Log.d("getPlaceAddress","Error parsing geometry array. " + e.getMessage());
         }
@@ -218,6 +233,4 @@ public class SearchGplace extends IntentService {
         }
         return resultObject;
     }
-
-
 }

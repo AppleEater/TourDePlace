@@ -58,36 +58,45 @@ public class SearchResultsTBL extends PlacesDB {
     }
     @Override
     protected Place parseCursorRow(Cursor cursor) {
-        Log.d("parseCursorRow", "Parsing cursor " + cursor.toString());
+        int id_index=-1,id_name=-1,id_addName=-1,id_addLat=-1,id_addLong=-1,id_gplaceID=-1,id_gPlaceIcon=-1,id_rating=-1;
+        Place returnPlace = null;
+        Log.d("parseCursor-SearchTBL","Parsing started");
 
-        int id_index = cursor.getColumnIndex(COL_ID);
-        int id_name = cursor.getColumnIndex(COL_NAME);
-        int id_addName = cursor.getColumnIndex(COL_ADD_NAME);
-        int id_addLat = cursor.getColumnIndex(COL_ADD_LAT);
-        int id_addLong = cursor.getColumnIndex(COL_ADD_LONG);
-        int id_gplaceID = cursor.getColumnIndex(COL_GPLACEID);
-        int id_gPlaceIcon = cursor.getColumnIndex(COL_GPLACEICON_URL);
-        int id_rating = cursor.getColumnIndex(COL_RATING);
+            id_index = cursor.getColumnIndex(COL_ID);
+            id_name = cursor.getColumnIndex(COL_NAME);
+            id_addName = cursor.getColumnIndex(COL_ADD_NAME);
+            id_addLat = cursor.getColumnIndexOrThrow(COL_ADD_LAT);
+            id_addLong = cursor.getColumnIndexOrThrow(COL_ADD_LONG);
+            id_gplaceID = cursor.getColumnIndex(COL_GPLACEID);
+            id_gPlaceIcon = cursor.getColumnIndex(COL_GPLACEICON_URL);
+            id_rating = cursor.getColumnIndex(COL_RATING);
 
-        cursor.moveToFirst();
 
         long placeId = cursor.getLong(id_index);
-        String placeName = cursor.getString(id_name);
-        String placeAddress = cursor.getString((id_addName != -1) ? id_addName:null);
-        Long placeAddress_lat = cursor.getLong((id_addLat!=-1)?id_addLat:0);
-        Long placeAddress_long = cursor.getLong((id_addLong!=-1)?id_addLong:0);
-        String gPlaceId = cursor.getString((id_gplaceID != -1) ? id_gplaceID:null);
-        String gPlaceIconUrl = cursor.getString((id_gPlaceIcon != -1) ? id_gPlaceIcon:null);
-        float placeRating = cursor.getFloat((id_rating != -1) ? id_rating : null);
+        String placeName = (id_name != -1) ? cursor.getString(id_name) : "N/A";
+        String placeAddress = (id_addName != -1) ? cursor.getString(id_addName) : null;
+        double placeAddress_lat = (id_addLat != -1) ? cursor.getDouble(id_addLat)  :  0;
+        double placeAddress_long = (id_addLong != -1) ? cursor.getDouble(id_addLong)  :  0;
+        String gPlaceId = (id_gplaceID != -1) ? cursor.getString(id_gplaceID) : null;
+        String gPlaceIconUrl = (id_gPlaceIcon != -1) ? cursor.getString(id_gPlaceIcon) : null;
+        float placeRating = (id_rating != -1) ? cursor.getFloat(id_rating)  :  0f;;
+        Log.d("parseCursorRow", "obtained info on place " + placeName + "[" + placeAddress + ":" + placeAddress_lat +","+placeAddress_long + "]");
 
-        Place returnPlace = new Place(
-                placeName
-                , new Address(placeAddress, placeAddress_lat, placeAddress_long)
-                , gPlaceId
-                , gPlaceIconUrl
-        );
-        returnPlace.setId(placeId);
-        returnPlace.setPlaceRating(placeRating);
+        try {
+            returnPlace = new Place(
+                    placeName
+                    , new Address(placeAddress, placeAddress_lat, placeAddress_long)
+                    , gPlaceId
+                    , gPlaceIconUrl
+            );
+            returnPlace.setId(placeId);
+            returnPlace.setPlaceRating(placeRating);
+            Log.d("parseCursorRow","Created place " + returnPlace.getName() +",Address: " + returnPlace.getAddress().getAddLat() + "," + returnPlace.getAddress().getAddLong() );
+
+        } catch (Exception e) {
+            Log.d("parseCursorRow", "Error creating Place. " + e.getMessage());
+        }
+
         return returnPlace;
     }
 
@@ -100,10 +109,11 @@ public class SearchResultsTBL extends PlacesDB {
         values.put(COL_ADD_LONG,place.getAddress().getAddLong());
         values.put(COL_GPLACEID,place.getgPlaceId());
         values.put(COL_GPLACEICON_URL,place.getPlaceIconUrl());
+        values.put(COL_RATING,place.getPlaceRating());
 
         return values;
     }
     protected String[] getSelectedColums(){
-        return(new String[] {COL_ID,COL_NAME,COL_ADD_NAME,COL_GPLACEICON_URL,COL_RATING});
+        return(new String[] {COL_ID,COL_NAME,COL_ADD_NAME,COL_ADD_LAT,COL_ADD_LONG,COL_GPLACEID,COL_GPLACEICON_URL,COL_RATING});
     }
 }

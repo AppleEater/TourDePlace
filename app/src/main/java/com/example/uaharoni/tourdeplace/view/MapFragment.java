@@ -84,12 +84,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
 
-        setCurrentLocation(MainActivity.currentLocation);
 
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d("onMapReady", "Map has permissions for location");
             mMap.setMyLocationEnabled(true);
         }
+        setCurrentLocation(MainActivity.currentLocation);
+
         /*
 
             LocationManager tempLocaManager = MainActivity.locationManager;

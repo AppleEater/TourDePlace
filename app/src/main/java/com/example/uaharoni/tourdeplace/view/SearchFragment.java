@@ -1,5 +1,6 @@
 package com.example.uaharoni.tourdeplace.view;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,8 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.uaharoni.tourdeplace.R;
-import com.example.uaharoni.tourdeplace.controller.PlaceListAdapter;
-import com.example.uaharoni.tourdeplace.controller.SearchReceiver;
+import com.example.uaharoni.tourdeplace.controller.PlacesAdapter;
 import com.example.uaharoni.tourdeplace.controller.SearchResultsTBL;
 import com.example.uaharoni.tourdeplace.model.Place;
 
@@ -32,7 +32,9 @@ public class SearchFragment extends Fragment {
     private SearchResultsTBL searchDbHelper;
     private SearchReceiver searchServiceReceiver;
    // private PlaceListAdapter searchAdapter;
-    static ProgressBar progressBar;
+   private  PlacesAdapter searchAdapter;
+    private RecyclerView recyclerView;
+    private ProgressBar progressBar;
     private ShareActionProvider shareView;
 
     public SearchFragment() {
@@ -53,11 +55,12 @@ public class SearchFragment extends Fragment {
         // Inflate the layout for this fragment
         View searchFragLayout = inflater.inflate(R.layout.fragment_search, container, false);
 
-        PlaceListAdapter searchAdapter  = new PlaceListAdapter(searchDbHelper.getAllPlaces(),R.id.rv_search);
+        searchAdapter  = new PlacesAdapter(getContext(),searchDbHelper.getAllPlaces());
 
-        RecyclerView recyclerView = (RecyclerView) searchFragLayout.findViewById(R.id.rv_search);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView = (RecyclerView) searchFragLayout.findViewById(R.id.rv_search);
         recyclerView.setAdapter(searchAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
 
         progressBar = (ProgressBar)searchFragLayout.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
@@ -69,16 +72,20 @@ public class SearchFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("SearchFrag","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
-        LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
+        //LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.d("SearchFrag","Removing receivers");
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchServiceReceiver);
+        //LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchServiceReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(searchServiceReceiver);
+
     }
-    public static void updateProgressBar(int statusCde) {
+    public void updateProgressBar(int statusCde) {
         switch (statusCde){
             case 0:
                 progressBar.setVisibility(View.VISIBLE);
@@ -89,6 +96,11 @@ public class SearchFragment extends Fragment {
             case 2:
                 progressBar.setVisibility(View.GONE);
         }
+    }
+    public  void refreshAdapter(){
+        Log.d("refreshAdapter","Refreshing RecyclerView adapter...");
+        searchAdapter.notifyDataSetChanged();
+        recyclerView.invalidate();
     }
 
     @Override
@@ -131,4 +143,44 @@ public class SearchFragment extends Fragment {
         intent.putExtra("PLACE_NAME",place.getName());
         shareView.setShareIntent(intent);
 }
-}
+    public class SearchReceiver extends BroadcastReceiver {
+        private String TAG = "SearchReceiver";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive");
+            if (intent != null) {
+                String intentAction = intent.getAction();
+                Log.d(TAG, "Received action " + intentAction);
+                if (intentAction.equals(context.getString(R.string.search_service_custom_intent_action))) {
+                    String serviceStatus = intent.getStringExtra(context.getString(R.string.search_service_custom_intent_status));
+                    Log.d(TAG, "Got Search service status: " + serviceStatus);
+                    Intent intentSnack = new Intent(context.getString(R.string.power_receiver_custom_intent_action));
+                    String message = "Unknown";
+                    switch (Integer.parseInt(serviceStatus)) {
+                        case 0:
+                            message = context.getString(R.string.search_service_status_RUNNING_text);
+                            break;
+                        case 1:
+                            message = context.getString(R.string.search_service_status_FINISHED_text);
+                            break;
+                        case 2:
+                            message = context.getString(R.string.search_service_status_ERROR_text);
+                            break;
+                        default:
+                            message = context.getString(R.string.search_service_status_UNKNOWN_text);
+                            break;
+                    }
+                    intentSnack.putExtra(context.getString(R.string.snackbar_message_custom_intent_extra_text), message);
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(intentSnack);
+                    updateProgressBar(Integer.parseInt(serviceStatus));
+                    if(Integer.parseInt(serviceStatus)==1){
+                        Log.d("onReceive", "Time to refresh the adapter");
+                        refreshAdapter();
+                    }
+                }
+            }
+        }
+    }
+
+    }

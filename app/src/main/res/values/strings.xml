@@ -36,8 +36,8 @@
     <string name="unit_system_mi" translatable="false">MI</string>
 
     <string-array name="distance_units_entries">
-        <item>@string/metric_system</item>
-        <item>@string/british_system</item>
+        <item>@string/unit_system_km_value</item>
+        <item>@string/unit_system_mi_value</item>
     </string-array>
     <string-array name="distance_units_values">
         <item>@string/unit_system_km</item>

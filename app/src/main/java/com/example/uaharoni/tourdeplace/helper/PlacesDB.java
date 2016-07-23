@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.CancellationSignal;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -83,11 +82,11 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
     }
     protected long insertPlace(@NonNull Place place, @NonNull String tblName){
         long rowid=0;
-        Log.d("insertPlace-PlacesDB","Inserting Place " + place.getName() + " to table " + tblName);
+        Log.d("insertPlace-PlacesDB","table: " + tblName + " -  Inserting Place " + place.getName() + "[" + place.getAddress().getAddLat() +"," + place.getAddress().getAddLong() + "]");
         ContentValues updatedValues = extractPlace(place);
         try{
             SQLiteDatabase db = this.getWritableDatabase();
-            rowid = db.insert(tblName, null, updatedValues);
+            rowid = db.insertOrThrow(tblName, null, updatedValues);
             db.close();
         } catch (Exception e) {
             Log.e("insertPlace-PlacesDB","Error Inserting " + place.getName() + " to table " + tblName + ". " + e.getMessage());
@@ -115,28 +114,27 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
     }
     protected ArrayList<Place> getAllPlaces(@NonNull String tblName, @Nullable String columnSorting){
         ArrayList<Place> placesList = new ArrayList<>();
+        Cursor crsrResults;
         Log.d("getPlacesArray-PlacesDB","Fetching data from " + tblName);
         String[] columnsList = getSelectedColums();
-        String selection = null;
         String[] selectionArgs={};
-        String groupBy = null,having = null;
-        String orderBy = columnSorting;
-        String limit = null;
-        CancellationSignal cancellationSignal = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        crsrResults = db.query(tblName,columnsList,null,selectionArgs,null,null,columnSorting,null);
+        Log.d("getAllPlaces","Results found: " + crsrResults.getCount());
+
         try {
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor crsrResutls = db.queryWithFactory(null,true,tblName,columnsList,selection,selectionArgs,groupBy,having,orderBy,limit);
             // looping through all rows and adding to list
-            if(crsrResutls.moveToFirst()){
+            if(crsrResults.moveToFirst()){
                 do {
-                    Place place = parseCursorRow(crsrResutls);
+                    Place place = parseCursorRow(crsrResults);
                     placesList.add(place);
-                }while (crsrResutls.moveToNext());
+                }while (crsrResults.moveToNext());
             }
-            db.close();
         } catch (Exception e){
             Log.e("getPlacesArray-PlacesDB","Failed to bring table info. " + e.getMessage());
         }
+        db.close();
+
         return placesList;
     }
     @Override
