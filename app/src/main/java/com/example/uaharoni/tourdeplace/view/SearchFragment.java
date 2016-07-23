@@ -31,8 +31,8 @@ public class SearchFragment extends Fragment {
 
     private SearchResultsTBL searchDbHelper;
     private SearchReceiver searchServiceReceiver;
-   // private PlaceListAdapter searchAdapter;
-   private  PlacesAdapter searchAdapter;
+    // private PlaceListAdapter searchAdapter;
+    private PlacesAdapter searchAdapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private ShareActionProvider shareView;
@@ -51,18 +51,18 @@ public class SearchFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("SearchFrag","Inflating View");
+        Log.d("SearchFrag", "Inflating View");
         // Inflate the layout for this fragment
         View searchFragLayout = inflater.inflate(R.layout.fragment_search, container, false);
 
-        searchAdapter  = new PlacesAdapter(getContext(),searchDbHelper.getAllPlaces());
+        searchAdapter = new PlacesAdapter(getContext(), searchDbHelper.getAllPlaces());
 
         recyclerView = (RecyclerView) searchFragLayout.findViewById(R.id.rv_search);
         recyclerView.setAdapter(searchAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
-        progressBar = (ProgressBar)searchFragLayout.findViewById(R.id.progressBar);
+        progressBar = (ProgressBar) searchFragLayout.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
 
         return searchFragLayout;
@@ -71,7 +71,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("SearchFrag","Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
+        Log.d("SearchFrag", "Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
         //LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
 
@@ -80,13 +80,14 @@ public class SearchFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("SearchFrag","Removing receivers");
+        Log.d("SearchFrag", "Removing receivers");
         //LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchServiceReceiver);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(searchServiceReceiver);
 
     }
+
     public void updateProgressBar(int statusCde) {
-        switch (statusCde){
+        switch (statusCde) {
             case 0:
                 progressBar.setVisibility(View.VISIBLE);
                 break;
@@ -97,8 +98,9 @@ public class SearchFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
         }
     }
-    public  void refreshAdapter(){
-        Log.d("refreshAdapter","Refreshing RecyclerView adapter...");
+
+    public void refreshAdapter() {
+        Log.d("refreshAdapter", "Refreshing RecyclerView adapter...");
         searchAdapter.notifyDataSetChanged();
         recyclerView.invalidate();
     }
@@ -116,7 +118,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.share_place,menu);
+        inflater.inflate(R.menu.share_place, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
         shareView = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
@@ -124,8 +126,8 @@ public class SearchFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("onOptionsItemSelecd","Selected item " + item.toString());
-        switch (item.getItemId()){
+        Log.d("onOptionsItemSelecd", "Selected item " + item.toString());
+        switch (item.getItemId()) {
             case R.id.action_share:
                 //TODO: Get the selected place
                 break;
@@ -134,15 +136,17 @@ public class SearchFragment extends Fragment {
         }
         return true;
     }
+
     public void doSharePlace(Place place) {
         // populate the share intent with data
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(getString(R.string.settings_last_location_latitude),place.getAddress().getAddLat());
-        intent.putExtra(getString(R.string.settings_last_location_longitude),place.getAddress().getAddLong());
-        intent.putExtra("PLACE_NAME",place.getName());
+        intent.putExtra(getString(R.string.settings_last_location_latitude), place.getAddress().getAddLat());
+        intent.putExtra(getString(R.string.settings_last_location_longitude), place.getAddress().getAddLong());
+        intent.putExtra("PLACE_NAME", place.getName());
         shareView.setShareIntent(intent);
-}
+    }
+
     public class SearchReceiver extends BroadcastReceiver {
         private String TAG = "SearchReceiver";
 
@@ -174,7 +178,7 @@ public class SearchFragment extends Fragment {
                     intentSnack.putExtra(context.getString(R.string.snackbar_message_custom_intent_extra_text), message);
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intentSnack);
                     updateProgressBar(Integer.parseInt(serviceStatus));
-                    if(Integer.parseInt(serviceStatus)==1){
+                    if (Integer.parseInt(serviceStatus) == 1) {
                         Log.d("onReceive", "Time to refresh the adapter");
                         refreshAdapter();
                     }
@@ -183,4 +187,5 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    }
+
+}

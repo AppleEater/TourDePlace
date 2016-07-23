@@ -91,43 +91,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         setCurrentLocation(MainActivity.currentLocation);
 
-        /*
-
-            LocationManager tempLocaManager = MainActivity.locationManager;
-            if (tempLocaManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Log.d("onMapReady", "GPS provider enabled. Getting LastKnownLocation");
-                mapLocation = tempLocaManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-            if (mapLocation == null) {
-                Log.d("onMapReady", "No LastKnownLocation for GPS Provider. Trying Passive...");
-                if (tempLocaManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
-                    mapLocation = tempLocaManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-                }
-            }
-            if (mapLocation != null) {
-                setCurrentLocation(mapLocation);
-            } else {
-                Log.w("onMapReady","No providers are enabled. Notifying user");
-                Snackbar.make(getActivity().findViewById(R.id.main_content),getString(R.string.alert_dialog_text),Snackbar.LENGTH_INDEFINITE)
-                        .setAction(getString(R.string.alert_dialog_positive), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivity(myIntent);
-                            }
-                        })
-                        .show();
-            }
-        } else {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
-            String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.9142638");
-            String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "34.7861329");
-            mapLocation = new Location(getString(R.string.search_service_location_name));
-            mapLocation.setLatitude(Double.valueOf(latPref));
-            mapLocation.setLongitude(Double.valueOf(longtPref));
-            setCurrentLocation(mapLocation);
-        }
-        */
     }
 
     public void setCurrentLocation(@Nullable Location updatedLocation) {

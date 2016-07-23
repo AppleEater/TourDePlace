@@ -90,8 +90,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("onResume-Main","onResume started.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //currentLocation = getLocationUpdates();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            currentLocation = getLocationUpdates();
         }
 
             if(currentLocation == null) {
