@@ -31,7 +31,6 @@ public class SearchFragment extends Fragment {
 
     private SearchResultsTBL searchDbHelper;
     private SearchReceiver searchServiceReceiver;
-    // private PlaceListAdapter searchAdapter;
     private PlacesAdapter searchAdapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;

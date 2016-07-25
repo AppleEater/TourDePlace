@@ -90,8 +90,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("onResume-Main","onResume started.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            currentLocation = getLocationUpdates();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (currentLocation != null) {
+                currentLocation = getLocationUpdates();
+            }
         }
 
             if(currentLocation == null) {
@@ -231,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         SearchFragment searchFrag = (SearchFragment)((ViewPagerAdapter)viewPager.getAdapter()).getItem(searchFragId);
         if(searchFrag != null){
             Log.d("onLocChanged","Updating the location in the search fragment");
+            searchFrag.refreshAdapter();
         }
     }
 
@@ -311,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             Log.d("getLocation","Using currentLocation from Preferences.");
             tempLocation = currentLocation;
         }
-        Log.d("getLocationUpdates","Returned location: " + tempLocation.toString());
+            Log.d("getLocationUpdates","Returned location: " + tempLocation.toString());
         return tempLocation;
     }
 
