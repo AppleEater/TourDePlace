@@ -44,8 +44,8 @@
     <string name="search_service_status_FINISHED_text">חיפוש מקומות הסתיים.</string>
     <string name="search_service_status_RUNNING_text">חיפוש מקומות מתבצע.</string>
     <string name="search_service_status_UNKNOWN_text">חיפוש מקומות נכשל. נסה שוב.</string>
-    <string name="action_search_any_title">הצג הכל סביבי</string>
-    <string name="action_search_business_title">הצג עסקים סביבי</string>
+    <string name="action_search_any_title">חפש הכל סביבי</string>
+    <string name="action_search_business_title">חפש בית עסק סביבי</string>
     <string name="unit_system_km_value">ק״מ</string>
     <string name="unit_system_mi_value">מייל</string>
 </resources>

@@ -6,40 +6,22 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.util.Log;
-
 import com.example.uaharoni.tourdeplace.helper.PlacesDB;
 import com.example.uaharoni.tourdeplace.model.Address;
 import com.example.uaharoni.tourdeplace.model.Place;
-
 import java.util.ArrayList;
 
 public class SearchResultsTBL extends PlacesDB {
-
     public SearchResultsTBL(Context context) {
         super(context);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        Log.i("onCreate_SearchResults", "inside onCreate");
-        String sqlCreateTable = "CREATE TABLE " +
-                TBL_NAME_SEARCH + "("
-                + COL_ID + INTEGER_TYPE + PRIMARY_KEY
-                + "," + COL_NAME + TEXT_TYPE
-                + "," + COL_ADD_NAME + TEXT_TYPE
-                + "," + COL_ADD_LAT + REAL_TYPE
-                + "," + COL_ADD_LONG + REAL_TYPE
-                + "," + COL_GPLACEID + TEXT_TYPE
-                + "," + COL_GPLACEICON_URL + TEXT_TYPE
-                + "," + COL_RATING + REAL_TYPE
-                + ")";
-        try {
-            Log.d("onCreate", "Running command " + sqlCreateTable);
-            sqLiteDatabase.execSQL(sqlCreateTable);
-        } catch (Exception e) {
-            Log.d("onCreate_SearchTBL", "Error creating table. " + e.getMessage());
-        }
         super.onCreate(sqLiteDatabase);
+
+        Log.i("onCreate_SearchTBL", "Local empty onCreate");
+
     }
     public long insertPlace(@NonNull Place place){
         return (super.insertPlace(place,TBL_NAME_SEARCH));
@@ -56,6 +38,7 @@ public class SearchResultsTBL extends PlacesDB {
     public ArrayList<Place> getAllPlaces(){
         return (super.getAllPlaces(TBL_NAME_SEARCH,null));
     }
+
     @Override
     protected Place parseCursorRow(Cursor cursor) {
         int id_index=-1,id_name=-1,id_addName=-1,id_addLat=-1,id_addLong=-1,id_gplaceID=-1,id_gPlaceIcon=-1,id_rating=-1;
@@ -101,7 +84,7 @@ public class SearchResultsTBL extends PlacesDB {
     }
 
     @Override
-    protected ContentValues extractPlace(Place place) {
+    protected ContentValues extractPlace(@NonNull Place place) {
         ContentValues values = new ContentValues();
         values.put(COL_NAME, place.getName());
         values.put(COL_ADD_NAME, place.getAddress().getName());
@@ -110,6 +93,7 @@ public class SearchResultsTBL extends PlacesDB {
         values.put(COL_GPLACEID,place.getgPlaceId());
         values.put(COL_GPLACEICON_URL,place.getPlaceIconUrl());
         values.put(COL_RATING,place.getPlaceRating());
+
 
         return values;
     }

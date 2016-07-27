@@ -8,33 +8,27 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-
+import com.example.uaharoni.tourdeplace.DividerItemDecoration;
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.PlacesAdapter;
 import com.example.uaharoni.tourdeplace.controller.SearchResultsTBL;
-import com.example.uaharoni.tourdeplace.model.Place;
-
 
 public class SearchFragment extends Fragment {
 
-    private SearchResultsTBL searchDbHelper;
+    private SearchResultsTBL dbHelper;
     private SearchReceiver searchServiceReceiver;
-    private PlacesAdapter searchAdapter;
+    private PlacesAdapter recyclerAdapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private ShareActionProvider shareView;
+
+    private String TAG = "SearchFrag";
 
     public SearchFragment() {
         // Required empty public constructor
@@ -43,110 +37,24 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        searchDbHelper = new SearchResultsTBL(getContext());
+        dbHelper = new SearchResultsTBL(getContext());
+
         searchServiceReceiver = new SearchReceiver();
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("SearchFrag", "Inflating View");
-        // Inflate the layout for this fragment
-        View searchFragLayout = inflater.inflate(R.layout.fragment_search, container, false);
-
-        searchAdapter = new PlacesAdapter(getContext(), searchDbHelper.getAllPlaces());
-
-        recyclerView = (RecyclerView) searchFragLayout.findViewById(R.id.rv_search);
-        recyclerView.setAdapter(searchAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true);
-
-
-        progressBar = (ProgressBar) searchFragLayout.findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
-
-        return searchFragLayout;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Log.d("SearchFrag", "Registering search service broadcast with action " + getString(R.string.search_service_custom_intent_action));
-        //LocalBroadcastManager.getInstance(getContext().getApplicationContext()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(searchServiceReceiver, new IntentFilter(getString(R.string.search_service_custom_intent_action)));
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.d("SearchFrag", "Removing receivers");
-        //LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(searchServiceReceiver);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(searchServiceReceiver);
-
     }
-
-    public void updateProgressBar(int statusCde) {
-        switch (statusCde) {
-            case 0:
-                progressBar.setVisibility(View.VISIBLE);
-                break;
-            case 1:
-                progressBar.setVisibility(View.GONE);
-                break;
-            case 2:
-                progressBar.setVisibility(View.GONE);
-        }
-    }
-
-    public void refreshAdapter() {
-        Log.d("refreshAdapter", "Refreshing RecyclerView adapter...");;
-        searchAdapter = new PlacesAdapter(getContext(), searchDbHelper.getAllPlaces());
-        recyclerView.setAdapter(searchAdapter);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.share_place, menu);
-
-        MenuItem shareItem = menu.findItem(R.id.action_share);
-        shareView = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("onOptionsItemSelecd", "Selected item " + item.toString());
-        switch (item.getItemId()) {
-            case R.id.action_share:
-                //TODO: Get the selected place
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
-    }
-
-    public void doSharePlace(Place place) {
-        // populate the share intent with data
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(getString(R.string.settings_last_location_latitude), place.getAddress().getAddLat());
-        intent.putExtra(getString(R.string.settings_last_location_longitude), place.getAddress().getAddLong());
-        intent.putExtra("PLACE_NAME", place.getName());
-        shareView.setShareIntent(intent);
-    }
-
     public class SearchReceiver extends BroadcastReceiver {
         private String TAG = "SearchReceiver";
 
@@ -186,6 +94,41 @@ public class SearchFragment extends Fragment {
             }
         }
     }
+    public void updateProgressBar(int statusCde) {
+        switch (statusCde) {
+            case 0:
+                progressBar.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                progressBar.setVisibility(View.GONE);
+                break;
+            case 2:
+                progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "Inflating View");
+        View fragmentLayout = inflater.inflate(R.layout.fragment_search, container, false);
+
+        recyclerView = (RecyclerView) fragmentLayout.findViewById(R.id.rv_search);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.ItemDecoration itemDecoration =
+                new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
+        recyclerView.addItemDecoration(itemDecoration);
+        refreshAdapter();
 
 
+        progressBar = (ProgressBar) fragmentLayout.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+        return fragmentLayout;
+    }
+    protected void refreshAdapter() {
+        Log.d(TAG, "Refreshing RecyclerView adapter...");
+        recyclerAdapter = new PlacesAdapter(getContext(), dbHelper.getAllPlaces());
+        recyclerView.setAdapter(recyclerAdapter);
+    }
 }

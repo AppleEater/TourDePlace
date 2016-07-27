@@ -70,10 +70,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onResume();
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d("onResume-MapFrag", "Map has permissions for location");
-            mMap.setMyLocationEnabled(true);
-            setCurrentLocation(MainActivity.currentLocation);
+            if(mMap != null){
+                mMap.setMyLocationEnabled(true);
+                setCurrentLocation(MainActivity.currentLocation);
+            }
         }
-
+        Log.d("onResume-MapFrag", "Resume finished.");
     }
 
     @Override

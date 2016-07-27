@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (currentLocation != null) {
+                Log.d("onResume-Main","Getting Updated location");
                 currentLocation = getLocationUpdates();
             }
         }
@@ -155,9 +156,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());;
 
         Log.d("initTabs","Adding Fragments");
-        searchFragId  = viewPagerAdapter.addFragment(new SearchFragment(),getString(R.string.tab_search));
+        favFragId  = viewPagerAdapter.addFragment(new FavFragment(),getString(R.string.tab_favorites));
         mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
-        favFragId  = viewPagerAdapter.addFragment(new dummyFragment(),getString(R.string.tab_favorites));
+        searchFragId  = viewPagerAdapter.addFragment(new SearchFragment(),getString(R.string.tab_search));
+
+
 
         Log.d("initTabs","Connecting the tabs to the Adapter");
         viewPager.setOffscreenPageLimit(2);
@@ -233,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         SearchFragment searchFrag = (SearchFragment)((ViewPagerAdapter)viewPager.getAdapter()).getItem(searchFragId);
         if(searchFrag != null){
             Log.d("onLocChanged","Updating the location in the search fragment");
-            searchFrag.refreshAdapter();
+            //searchFrag.refreshAdapter();
         }
     }
 
