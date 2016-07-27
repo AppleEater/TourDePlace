@@ -110,7 +110,7 @@ public class SearchGplace extends IntentService {
         }
 
         if(placeArrayList.size()>0){
-            SearchResultsTBL searchDbHelper = new SearchResultsTBL(getApplicationContext());
+            SearchTBL searchDbHelper = new SearchTBL(getApplicationContext());
             Log.d("getPlacesList", "Deleting searchResults table.");
             searchDbHelper.deleteTBL();
             Log.d("getPlacesList", "Inserting new results to SearchResults table.");

@@ -11,8 +11,8 @@ import com.example.uaharoni.tourdeplace.model.Address;
 import com.example.uaharoni.tourdeplace.model.Place;
 import java.util.ArrayList;
 
-public class SearchResultsTBL extends PlacesDB {
-    public SearchResultsTBL(Context context) {
+public class SearchTBL extends PlacesDB {
+    public SearchTBL(Context context) {
         super(context);
     }
 

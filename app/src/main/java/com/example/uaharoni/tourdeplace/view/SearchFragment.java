@@ -18,11 +18,11 @@ import android.widget.ProgressBar;
 import com.example.uaharoni.tourdeplace.DividerItemDecoration;
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.PlacesAdapter;
-import com.example.uaharoni.tourdeplace.controller.SearchResultsTBL;
+import com.example.uaharoni.tourdeplace.controller.SearchTBL;
 
 public class SearchFragment extends Fragment {
 
-    private SearchResultsTBL dbHelper;
+    private SearchTBL dbHelper;
     private SearchReceiver searchServiceReceiver;
     private PlacesAdapter recyclerAdapter;
     private RecyclerView recyclerView;
@@ -37,7 +37,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbHelper = new SearchResultsTBL(getContext());
+        dbHelper = new SearchTBL(getContext());
 
         searchServiceReceiver = new SearchReceiver();
     }

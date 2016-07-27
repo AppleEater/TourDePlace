@@ -15,9 +15,9 @@ import com.example.uaharoni.tourdeplace.model.Place;
 import java.util.ArrayList;
 
 public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
-    private static final int DB_VER = 1;
-    private static final String DB_NAME = "places.db";
-    public static final String TBL_NAME_SEARCH = "last_search";
+    protected static final int DB_VER = 1;
+    protected static final String DB_NAME = "places.sqlite";
+    public static final String TBL_NAME_SEARCH = "search";
     public static final String TBL_NAME_FAVORITES = "favorites";
 
     public final String TEXT_TYPE = " TEXT";
@@ -37,6 +37,29 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
     public static final String COL_GPLACEICON_URL = "gplace_icon_url";
     public static final String COL_RATING = "rating";
 
+    private final String sqlCreateTableSearch =  "CREATE TABLE " +
+            TBL_NAME_SEARCH + " ("
+            + COL_ID + INTEGER_TYPE + PRIMARY_KEY
+            +  "," + COL_NAME + TEXT_TYPE
+            +  "," +  COL_ADD_NAME + TEXT_TYPE
+            + "," + COL_ADD_LAT + REAL_TYPE
+            + "," + COL_ADD_LONG + REAL_TYPE
+            + "," + COL_GPLACEID + TEXT_TYPE
+            + "," + COL_GPLACEICON_URL + TEXT_TYPE
+            + "," + COL_RATING + REAL_TYPE
+            + ")";
+
+    private final String sqlCreateTableFav =  "CREATE TABLE  " +
+            TBL_NAME_FAVORITES + " ("
+            + COL_ID + INTEGER_TYPE + PRIMARY_KEY
+            +  "," + COL_NAME + TEXT_TYPE
+            +  "," +  COL_ADD_NAME + TEXT_TYPE
+            + "," + COL_ADD_LAT + REAL_TYPE
+            + "," + COL_ADD_LONG + REAL_TYPE
+            + "," + COL_GPLACEID + TEXT_TYPE
+            + "," + COL_GPLACEICON_URL + TEXT_TYPE
+            + ")";
+
 
     public static final String LOG = "placesDbHelper";
 
@@ -46,6 +69,11 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        Log.d("onCreate-PlacesDB","Super constructor is running. Creating tables...");
+        Log.d("onCreate", "Running command " + sqlCreateTableSearch);
+        sqLiteDatabase.execSQL(sqlCreateTableSearch);
+        Log.d("onCreate", "Running command " + sqlCreateTableFav);
+        sqLiteDatabase.execSQL(sqlCreateTableFav);
     }
     protected void deleteTBL(String tblName){
         Log.d("deleteTBL-PlaceDB","Deleting table " + tblName);
@@ -112,34 +140,39 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
         }
         return linesReturned;
     }
-    protected ArrayList<Place> getAllPlaces(@NonNull String tblName, @Nullable String columnSorting){
+    public ArrayList<Place> getAllPlaces(@NonNull String tblName, @Nullable String columnSorting){
+        SQLiteDatabase db = null;
         ArrayList<Place> placesList = new ArrayList<>();
         Cursor crsrResults;
         Log.d("getPlacesArray-PlacesDB","Fetching data from " + tblName);
         String[] columnsList = getSelectedColums();
         String[] selectionArgs={};
-        SQLiteDatabase db = this.getReadableDatabase();
-        crsrResults = db.query(tblName,columnsList,null,selectionArgs,null,null,columnSorting,null);
-        Log.d("getAllPlaces","Results found: " + crsrResults.getCount());
 
-        try {
-            // looping through all rows and adding to list
+    Log.d("getPlacesArray-PlacesDB","Open Database");
+        db = getReadableDatabase();
+        if (db != null){
+            Log.d("getPlacesArray-PlacesDB","Query table " + tblName);
+            crsrResults = db.query(tblName,columnsList,null,selectionArgs,null,null,columnSorting,null);
             if(crsrResults.moveToFirst()){
+                // looping through all rows and adding to list
                 do {
                     Place place = parseCursorRow(crsrResults);
                     placesList.add(place);
                 }while (crsrResults.moveToNext());
             }
-        } catch (Exception e){
-            Log.e("getPlacesArray-PlacesDB","Failed to bring table info. " + e.getMessage());
+            db.close();
+            Log.d("getAllPlaces","Results found: " + crsrResults.getCount());
+        } else {
+            Log.d("getAllPlaces","Failed to open DB");
         }
-        db.close();
-
         return placesList;
     }
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         Log.i("onUpgrade_PlacesDB","inside onUpgrade");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TBL_NAME_SEARCH);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TBL_NAME_FAVORITES);
+        onCreate(sqLiteDatabase);
     }
 
     protected abstract Place parseCursorRow(Cursor cursor);
