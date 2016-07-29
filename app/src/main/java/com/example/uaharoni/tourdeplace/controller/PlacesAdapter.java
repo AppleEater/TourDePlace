@@ -11,15 +11,24 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.model.Place;
 import com.example.uaharoni.tourdeplace.view.MainActivity;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 // Create the basic adapter extending from RecyclerView.Adapter
 public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolder> {
+
+    private static ArrayList<Place> places;
+    private Context context;
+    public OnItemClickListener mItemClickListener;
+    private String distanceUnit;
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // Your holder should contain a member variable for any view that will be set as you render a row
@@ -27,12 +36,14 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
         private RatingBar rbPlaceRating;
         private ImageView iVPlaceImage;
         private Context context;
+        private OnItemClickListener itemClickListener;
+
 
         private String TAG = "ViewHolder";
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView,OnItemClickListener mItemClickListener) {
             super(itemView);
-            Log.d(TAG, "Initializing ViewHolder");
+            Log.d(TAG, "Initializing ViewHolder constructor");
 
             txtPlaceName = (TextView) itemView.findViewById(R.id.txtPlaceName);
             txtPlaceAddress = (TextView) itemView.findViewById(R.id.txtPlaceAddress);
@@ -40,16 +51,17 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
             txtPlaceDistance = (TextView) itemView.findViewById(R.id.txtPlaceDistance);
             rbPlaceRating = (RatingBar) itemView.findViewById(R.id.rb_placeRating);
             context = itemView.getContext();
-            itemView.setClickable(true);
             itemView.setOnClickListener(this);
-
+            itemClickListener = mItemClickListener;
         }
+
 
         public void bind(@NonNull final Place remotePlace) {
             Log.d("bind", "Showing remote place " + remotePlace.getName() + "[" + remotePlace.getAddress().getAddLat() + "," + remotePlace.getAddress().getAddLong() + "]");
             txtPlaceName.setText(remotePlace.getName());
             txtPlaceAddress.setText(remotePlace.getAddress().getName());
             txtPlaceDistance.setText(getDistanceString(remotePlace));
+
 
             if (rbPlaceRating != null) {
                 rbPlaceRating.setRating(remotePlace.getPlaceRating());
@@ -58,7 +70,7 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
                 Picasso.with(context)
                         .load(remotePlace.getPlaceIconUrl())
                         .placeholder(android.R.drawable.ic_menu_upload_you_tube)
-                        .skipMemoryCache()
+                        .memoryPolicy(MemoryPolicy.NO_STORE)
                         .into(iVPlaceImage);
             }
         }
@@ -94,28 +106,37 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
 
         @Override
         public void onClick(View view) {
-            Log.d(TAG, "Clicked view at position " + getLayoutPosition());
+            int position = getLayoutPosition();
+            Log.d("onClick-ViewHolder","Clicked item number " + position);
+            Place selectedPlace = PlacesAdapter.places.get(position);
+            Log.d("onClick-ViewHolder","Got place " + selectedPlace.getName() + ". Calling parent fragment...");
+            if(itemClickListener != null) {
+                itemClickListener.onItemClick(selectedPlace);
+            }
+
+
         }
+
+
+    }   // End of class ViewHolder
+
+    public void SetOnItemClickListener(OnItemClickListener mItemClickListener){
+        this.mItemClickListener = mItemClickListener;
     }
-
-    private ArrayList<Place> places;
-    private String distanceUnit;
-    private static final int SEARCH_ITEM = 0; // Declaring Variable to Understand which View is being worked on
-    private static final int FAV_ITEM = 1;
-
-
-
     public PlacesAdapter(Context context, ArrayList<Place> places) {
         Log.d("PlacesAdapter","Init Constructor...");
         this.places = places;
+        this.context = context;
+
         distanceUnit = MainActivity.sharedPreferences.getString(context.getString(R.string.settings_distance_units_key),context.getString(R.string.unit_system_km));
     }
+
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = null;
-        Context context = parent.getContext();
+
         LayoutInflater inflater = LayoutInflater.from(context);
         Log.d("onCreateViewHolder", "Got Parent " + parent.toString());
 
@@ -131,9 +152,8 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
                 Log.d("onCreateViewHolder", "No parent view identified");
                 break;
         }
-
         // Return a new holder instance
-        return (new ViewHolder(itemView));
+        return (new ViewHolder(itemView,mItemClickListener));
     }
 
     @Override
@@ -151,4 +171,4 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
         return places.size();
     }
 
-}
+}   // End of Class PlacesAdapter

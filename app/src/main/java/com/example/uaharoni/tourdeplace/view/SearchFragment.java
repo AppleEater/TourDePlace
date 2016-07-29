@@ -15,23 +15,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import com.example.uaharoni.tourdeplace.DividerItemDecoration;
+import com.example.uaharoni.tourdeplace.controller.DividerItemDecoration;
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.controller.OnItemClickListener;
+import com.example.uaharoni.tourdeplace.controller.OnPlaceSelected;
 import com.example.uaharoni.tourdeplace.controller.PlacesAdapter;
 import com.example.uaharoni.tourdeplace.controller.SearchTBL;
+import com.example.uaharoni.tourdeplace.model.Place;
 
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements OnItemClickListener {
 
     private SearchTBL dbHelper;
     private SearchReceiver searchServiceReceiver;
     private PlacesAdapter recyclerAdapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    OnPlaceSelected mCallback;
+
 
     private String TAG = "SearchFrag";
 
     public SearchFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // This makes sure that the container activity has implemented the callback interface. If not, it throws an exception
+        try {
+            mCallback = (OnPlaceSelected) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
     }
 
     @Override
@@ -55,6 +72,9 @@ public class SearchFragment extends Fragment {
         Log.d("SearchFrag", "Removing receivers");
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(searchServiceReceiver);
     }
+
+
+
     public class SearchReceiver extends BroadcastReceiver {
         private String TAG = "SearchReceiver";
 
@@ -121,7 +141,6 @@ public class SearchFragment extends Fragment {
         recyclerView.addItemDecoration(itemDecoration);
         refreshAdapter();
 
-
         progressBar = (ProgressBar) fragmentLayout.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         return fragmentLayout;
@@ -129,6 +148,13 @@ public class SearchFragment extends Fragment {
     protected void refreshAdapter() {
         Log.d(TAG, "Refreshing RecyclerView adapter...");
         recyclerAdapter = new PlacesAdapter(getContext(), dbHelper.getAllPlaces());
+        recyclerAdapter.SetOnItemClickListener(this);
         recyclerView.setAdapter(recyclerAdapter);
+    }
+    @Override
+    public void onItemClick(Place place) {
+        Log.d("onItemClick-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add marker at MapFragment");
+        // Send the event to the host activity
+        mCallback.onDisplayPlaceOnMap(place);
     }
 }

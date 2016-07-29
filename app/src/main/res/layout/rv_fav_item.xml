@@ -28,9 +28,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/txtPlaceName"
             android:maxLines="1"
-            android:inputType="text|textNoSuggestions"
             android:textStyle="bold"
-            android:ellipsize="end"
             />
 
         <TextView

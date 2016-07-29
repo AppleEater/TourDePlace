@@ -108,21 +108,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             refreshMap(geoCoordinates);
 
             if (currentLocationMarker != null) {
+                Log.d("setCurrntLcatn-MapFrag", "Removing existing marker");
                 currentLocationMarker.remove();
-                MarkerOptions markerOptions = new MarkerOptions()
+            }
+            MarkerOptions markerOptions = new MarkerOptions()
                         .position(geoCoordinates)
                         .title(getString(R.string.marker_current_location))
                         .alpha(0.7f)
                         .icon(BitmapDescriptorFactory
                                 .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
                         );
-                if(mMap != null){
+            if(mMap != null){
                     Log.d("setCurLoc-MapFrag","Adding Marker");
                     currentLocationMarker = mMap.addMarker(markerOptions);
-                }
-
             }
-
         }
     }
     public void refreshMap(@NonNull LatLng location) {
@@ -135,22 +134,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void addPlaceMarker(@NonNull Place place) {
+        Log.d("addPlaceMarker-MapFrag", "Create a marker for place: " + place.getName() + "[" + place.getAddress().getAddLat() + "," + place.getAddress().getAddLong() + "]");
         String name = place.getName();
         String address = place.getAddress().getName();
         double lat = place.getAddress().getAddLat();
         double lng = place.getAddress().getAddLong();
-        String iconUrl = place.getPlaceIconUrl();
-        //TODO: Bring URL in AsyncTask
+        LatLng geoCoordinates = new LatLng(lat,lng);
+
 
         MarkerOptions markerOptions = new MarkerOptions()
-                .position(new LatLng(lat, lng))
+                .position(geoCoordinates)
                 .title(name)
                 .alpha(0.9f)
                 .snippet(address)
-                .icon(BitmapDescriptorFactory.fromPath("https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"));
-        // the icon is expermiental
+                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         if(mMap != null){
+            Log.d("addPlaceMarker-MapFrag", "Display Marker");
             mMap.addMarker(markerOptions);
+            refreshMap(geoCoordinates);
         }
     }
 

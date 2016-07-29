@@ -1,7 +1,7 @@
 package com.example.uaharoni.tourdeplace.view;
 
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,24 +17,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.uaharoni.tourdeplace.DividerItemDecoration;
+import com.example.uaharoni.tourdeplace.controller.DividerItemDecoration;
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.FavsTBL;
+import com.example.uaharoni.tourdeplace.controller.OnItemClickListener;
+import com.example.uaharoni.tourdeplace.controller.OnPlaceSelected;
 import com.example.uaharoni.tourdeplace.controller.PlacesAdapter;
 import com.example.uaharoni.tourdeplace.model.Place;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FavFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- */
-public class FavFragment extends Fragment {
+public class FavFragment extends Fragment implements OnItemClickListener {
 
-    private FavsTBL FavDbHelper;
+    private FavsTBL dbHelper;
     private PlacesAdapter recyclerAdapter;
     private RecyclerView recyclerView;
     private ShareActionProvider shareView;
+    OnPlaceSelected mCallback;
 
 
     private String TAG = "FavFrag";
@@ -43,11 +40,23 @@ public class FavFragment extends Fragment {
     public FavFragment() {
         // Required empty public constructor
     }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // This makes sure that the container activity has implemented the callback interface. If not, it throws an exception
+        try {
+            mCallback = (OnPlaceSelected) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FavDbHelper = new FavsTBL(getContext());
+        dbHelper = new FavsTBL(getContext());
         setHasOptionsMenu(true);
     }
 
@@ -58,8 +67,6 @@ public class FavFragment extends Fragment {
 
         recyclerView = (RecyclerView) favFragLayout.findViewById(R.id.rv_fav);
         refreshAdapter();
-        //recyclerAdapter = new PlacesAdapter(getContext(), FavDbHelper.getAllPlaces());
-        //recyclerView.setAdapter(recyclerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
         RecyclerView.ItemDecoration itemDecoration =
@@ -102,8 +109,14 @@ public class FavFragment extends Fragment {
     }
     public void refreshAdapter() {
         Log.d("refreshAdapter-FavsFrag", "Refreshing RecyclerView adapter...");
-        recyclerAdapter = new PlacesAdapter(getContext(), FavDbHelper.getAllPlaces());
+        recyclerAdapter = new PlacesAdapter(getContext(), dbHelper.getAllPlaces());
+        recyclerAdapter.SetOnItemClickListener(this);
         recyclerView.setAdapter(recyclerAdapter);
     }
 
+    @Override
+    public void onItemClick(Place place) {
+        Log.d("onItemClick-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add marker at MapFragment");
+        mCallback.onDisplayPlaceOnMap(place);
+    }
 }

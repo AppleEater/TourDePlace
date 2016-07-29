@@ -1,7 +1,6 @@
 package com.example.uaharoni.tourdeplace.view;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,27 +24,29 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.controller.OnPlaceSelected;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
+import com.example.uaharoni.tourdeplace.model.Place;
 
-public class MainActivity extends AppCompatActivity implements LocationListener, SearchView.OnQueryTextListener, RecyclerView.OnItemTouchListener {
+public class MainActivity extends AppCompatActivity
+            implements LocationListener, SearchView.OnQueryTextListener,OnPlaceSelected {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
     ViewPager viewPager;
     private SearchView searchView;
-    int searchFragId,mapFragId,favFragId;
+    int searchFragId=-1,mapFragId=-1,favFragId=-1;
+
 
 
     private SnackBarReceiver snackBarMessageReceiver;
@@ -90,21 +91,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("onResume-Main","onResume started.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (currentLocation != null) {
                 Log.d("onResume-Main","Getting Updated location");
                 currentLocation = getLocationUpdates();
             }
-        }
+
+            // This is a double check in case the getLocationUpdates returns no location
 
             if(currentLocation == null) {
-            Log.d("onResume-Main", "No current location. Using from Preferences");
-            String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
-            String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
-            currentLocation = new Location(getString(R.string.search_service_location_name));
-            currentLocation.setLatitude(Double.parseDouble(latPref));
-            currentLocation.setLongitude(Double.parseDouble(longtPref));
-            Log.d("onResume-Main", "CurrentLocation: " + currentLocation.toString());
+                Log.d("onResume-Main", "No current location. Using from Preferences");
+                String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
+                String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
+                currentLocation = new Location(getString(R.string.search_service_location_name));
+                currentLocation.setLatitude(Double.parseDouble(latPref));
+                currentLocation.setLongitude(Double.parseDouble(longtPref));
+                Log.d("onResume-Main", "CurrentLocation: " + currentLocation.toString());
+                Location dummyLoc = getLocationUpdates();
+            }
         }
     }
 
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             locationManager.removeUpdates(this);
         }
         if(currentLocation != null){
-            Log.d("onPause","Saving last location to Prefs: ");
+            Log.d("onPause","Saving last location to Prefs.");
             sharedPreferences.edit()
                     .putString(getString(R.string.settings_last_location_latitude),String.valueOf(currentLocation.getLatitude()))
                     .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLongitude()))
@@ -129,6 +133,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private void initReceivers(){
         snackBarMessageReceiver = new SnackBarReceiver();
     }
+
+    @Override
+    public void onDisplayPlaceOnMap(Place place) {
+        Log.d("onDisplayPlaceOnMap","Got Place " + place.getName());
+        Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
+        if (mapFrag != null) {
+            Log.d("onDisplayPlaceOnMap", "Display marker in the map fragment");
+            ((MapFragment) mapFrag).addPlaceMarker(place);
+            viewPager.setCurrentItem(mapFragId);
+        }
+    }
+
 
     private class SnackBarReceiver extends BroadcastReceiver {
 
@@ -153,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private void initTabs() {
 
         viewPager = (ViewPager) findViewById(R.id.fragment_container);
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());;
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         Log.d("initTabs","Adding Fragments");
         favFragId  = viewPagerAdapter.addFragment(new FavFragment(),getString(R.string.tab_favorites));
@@ -236,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         SearchFragment searchFrag = (SearchFragment)((ViewPagerAdapter)viewPager.getAdapter()).getItem(searchFragId);
         if(searchFrag != null){
             Log.d("onLocChanged","Updating the location in the search fragment");
-            //searchFrag.refreshAdapter();
+            searchFrag.refreshAdapter();
         }
     }
 
@@ -372,21 +388,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public boolean onQueryTextChange(String newText) {
         return false;
     }
-    @Override
-    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-        return false;
-    }
 
-    @Override
-    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-    }
-
-    @Override
-    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-    }
-
+    /*
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.d("onTouchEvent","Got event " + event.toString());
@@ -410,4 +413,5 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         }
     }
+    */
 }
