@@ -1,4 +1,4 @@
-package com.example.uaharoni.tourdeplace;
+package com.example.uaharoni.tourdeplace.controller;
 
 import android.content.Context;
 import android.content.res.TypedArray;
