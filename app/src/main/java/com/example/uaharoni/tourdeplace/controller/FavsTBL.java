@@ -86,6 +86,6 @@ public class FavsTBL extends PlacesDB {
         return values;
     }
     protected String[] getSelectedColums(){
-        return(new String[] {COL_ID,COL_NAME,COL_ADD_NAME,COL_ADD_LAT,COL_ADD_LONG,COL_GPLACEID,COL_GPLACEICON_URL});
+        return(new String[] {COL_ID,COL_NAME,COL_ADD_NAME,COL_ADD_LAT,COL_ADD_LONG,COL_GPLACEID});
     }
 }

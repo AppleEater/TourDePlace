@@ -31,15 +31,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.controller.OnPlaceLongSelected;
 import com.example.uaharoni.tourdeplace.controller.OnPlaceSelected;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
 import com.example.uaharoni.tourdeplace.model.Place;
 
 public class MainActivity extends AppCompatActivity
-            implements LocationListener, SearchView.OnQueryTextListener,OnPlaceSelected {
+            implements LocationListener, SearchView.OnQueryTextListener,OnPlaceSelected,OnPlaceLongSelected {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -92,13 +92,9 @@ public class MainActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (currentLocation != null) {
-                Log.d("onResume-Main","Getting Updated location");
-                currentLocation = getLocationUpdates();
-            }
+            currentLocation = getLocationUpdates();
 
             // This is a double check in case the getLocationUpdates returns no location
-
             if(currentLocation == null) {
                 Log.d("onResume-Main", "No current location. Using from Preferences");
                 String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
@@ -107,7 +103,7 @@ public class MainActivity extends AppCompatActivity
                 currentLocation.setLatitude(Double.parseDouble(latPref));
                 currentLocation.setLongitude(Double.parseDouble(longtPref));
                 Log.d("onResume-Main", "CurrentLocation: " + currentLocation.toString());
-                Location dummyLoc = getLocationUpdates();
+               // Location dummyLoc = getLocationUpdates();
             }
         }
     }
@@ -143,6 +139,20 @@ public class MainActivity extends AppCompatActivity
             ((MapFragment) mapFrag).addPlaceMarker(place);
             viewPager.setCurrentItem(mapFragId);
         }
+    }
+
+    @Override
+    public void onAddToFavorites(Place place) {
+        FavFragment favFrag = (FavFragment) ((ViewPagerAdapter)viewPager.getAdapter()).getItem(favFragId);
+        if(favFrag != null){
+            Log.d("onAddToFavorites","Adding place " + place.getName() + " in Fav Fragment");
+            favFrag.addPlace(place);
+        }
+    }
+
+    @Override
+    public void onSharePlace(Place place) {
+
     }
 
 
@@ -330,10 +340,15 @@ public class MainActivity extends AppCompatActivity
         if(lastKnownLocation != null){
             tempLocation = lastKnownLocation;
         } else {
-            Log.d("getLocation","Using currentLocation from Preferences.");
-            tempLocation = currentLocation;
+            if(currentLocation != null){
+                Log.d("getLocation","Using currentLocation from Preferences.");
+                tempLocation = currentLocation;
+            }
+
         }
+        if(tempLocation != null){
             Log.d("getLocationUpdates","Returned location: " + tempLocation.toString());
+        }
         return tempLocation;
     }
 

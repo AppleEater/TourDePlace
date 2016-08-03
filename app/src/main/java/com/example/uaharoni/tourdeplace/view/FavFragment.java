@@ -3,6 +3,7 @@ package com.example.uaharoni.tourdeplace.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -98,7 +99,13 @@ public class FavFragment extends Fragment implements OnItemClickListener {
         }
         return true;
     }
-    public void doSharePlace(Place place) {
+
+    @Override
+    public void onItemClick(@NonNull Place place) {
+        Log.d("onItemClick-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add marker at MapFragment");
+        mCallback.onDisplayPlaceOnMap(place);
+    }
+    public void doSharePlace(@NonNull Place place) {
         // populate the share intent with data
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
@@ -113,10 +120,14 @@ public class FavFragment extends Fragment implements OnItemClickListener {
         recyclerAdapter.SetOnItemClickListener(this);
         recyclerView.setAdapter(recyclerAdapter);
     }
-
-    @Override
-    public void onItemClick(Place place) {
-        Log.d("onItemClick-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add marker at MapFragment");
-        mCallback.onDisplayPlaceOnMap(place);
+    protected void addPlace(@NonNull Place place){
+        Log.d("addPlace-FavFrag","Adding place " + place.getName() + "(gplaceId: " + place.getgPlaceId() + ") to FavDB");
+        dbHelper.insertPlace(place);
+        recyclerAdapter.notifyItemInserted(recyclerAdapter.getItemCount()-1);
+    }
+    protected void deletePlace (@NonNull Place place, @NonNull int position){
+        Log.d("deletePlace-FavFrag","Deleting place " + place.getName() + "(gplaceId: " + place.getgPlaceId() + ") from FavDB");
+        dbHelper.deletePlace(place);
+        recyclerAdapter.notifyItemRemoved(position);
     }
 }

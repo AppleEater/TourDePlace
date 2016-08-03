@@ -3,9 +3,11 @@ package com.example.uaharoni.tourdeplace.controller;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -30,7 +32,7 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
     private String distanceUnit;
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, View.OnLongClickListener {
         // Your holder should contain a member variable for any view that will be set as you render a row
         private TextView txtPlaceName, txtPlaceAddress, txtPlaceDistance;
         private RatingBar rbPlaceRating;
@@ -43,7 +45,8 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
 
         public ViewHolder(View itemView,OnItemClickListener mItemClickListener) {
             super(itemView);
-            Log.d(TAG, "Initializing ViewHolder constructor");
+            Log.d(TAG, "Initializing ViewHolder  with RootView " +   itemView.getRootView().getId());
+
 
             txtPlaceName = (TextView) itemView.findViewById(R.id.txtPlaceName);
             txtPlaceAddress = (TextView) itemView.findViewById(R.id.txtPlaceAddress);
@@ -53,6 +56,8 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
             context = itemView.getContext();
             itemView.setOnClickListener(this);
             itemClickListener = mItemClickListener;
+            itemView.setOnLongClickListener(this);
+
         }
 
 
@@ -118,6 +123,32 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
         }
 
 
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Log.d("onMenuItemClick","Clicked item " + item.getTitle());
+            Place selectedPlace = places.get(getLayoutPosition());
+            switch (item.getItemId()) {
+                case R.id.search_frag_add_to_favorites:
+                    Log.d("onMenuItemClick","Adding place " + selectedPlace.getName() + " to Favorites");
+
+
+                return true;
+                case R.id.search_frag_share:
+                    Log.d("onMenuItemClick","Sharing place " + selectedPlace.getName() + " to other places");
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            PopupMenu popup = new PopupMenu(context,view);
+            popup.setOnMenuItemClickListener(this);
+            popup.inflate(R.menu.search_frag_popup);
+            popup.show();
+            return true;
+        }
     }   // End of class ViewHolder
 
     public void SetOnItemClickListener(OnItemClickListener mItemClickListener){
@@ -131,14 +162,13 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
         distanceUnit = MainActivity.sharedPreferences.getString(context.getString(R.string.settings_distance_units_key),context.getString(R.string.unit_system_km));
     }
 
-
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = null;
 
+
         LayoutInflater inflater = LayoutInflater.from(context);
-        Log.d("onCreateViewHolder", "Got Parent " + parent.toString());
+        Log.d("onCreateViewHolder", "Got Parent " + parent.getId());
 
         // We don't care about the position. only the parentView
         switch (parent.getId()){
@@ -161,7 +191,6 @@ public class PlacesAdapter  extends RecyclerView.Adapter<PlacesAdapter.ViewHolde
         // Get the data model based on position
         Place place = places.get(position);
         Log.d("onBindViewHolder","Got place " + place.getName() + " [" + place.getAddress().getAddLat() + "," + place.getAddress().getAddLong() + "]  at position " + position);
-
         // Set item views based on your views and data model
         holder.bind(place);
     }

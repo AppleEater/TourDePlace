@@ -48,4 +48,5 @@
     <string name="action_search_business_title">חפש בית עסק סביבי</string>
     <string name="unit_system_km_value">ק״מ</string>
     <string name="unit_system_mi_value">מייל</string>
+    <string name="add_to_favorites">שמור למועדפים</string>
 </resources>

@@ -1,11 +1,15 @@
 <resources>
     <string name="app_name">TourDePlace</string>
-    <!-- Menu String -->
+    <!-- Overflow Menu String -->
     <string name="action_settings">Settings</string>
     <string name="action_search_business_title">Search specific business</string>
     <string name="action_search_any_title">Search anything around</string>
 
     <string name="action_feedback">Feedback</string>
+
+
+    <!-- Popup  Menu String Search Frag-->
+    <string name="add_to_favorites">Save in Favorites</string>
 
     <!-- Tab Strings -->
     <string name="tab_search">Search results</string>
@@ -30,7 +34,7 @@
 
     <string name="settings_distance_units_key" translatable="false">DISTANCE_UNITS</string>
     <string name="settings_distance_units_title">Display distance in</string>
-    <string name="unit_system_km_value">Kilometers</string>
+    <string name="unit_system_km_value">KM</string>
     <string name="unit_system_mi_value">Miles</string>
     <string name="unit_system_km" translatable="false">KM</string>
     <string name="unit_system_mi" translatable="false">MI</string>
