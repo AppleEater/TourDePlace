@@ -31,15 +31,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
 import com.example.uaharoni.tourdeplace.R;
-import com.example.uaharoni.tourdeplace.controller.OnPlaceLongSelected;
-import com.example.uaharoni.tourdeplace.controller.OnPlaceSelected;
+import com.example.uaharoni.tourdeplace.controller.OnItemClickListener;
+import com.example.uaharoni.tourdeplace.controller.OnItemLongClickListener;
 import com.example.uaharoni.tourdeplace.controller.ViewPagerAdapter;
 import com.example.uaharoni.tourdeplace.helper.LocationHelper;
 import com.example.uaharoni.tourdeplace.model.Place;
 
 public class MainActivity extends AppCompatActivity
-            implements LocationListener, SearchView.OnQueryTextListener,OnPlaceSelected,OnPlaceLongSelected {
+            implements LocationListener, SearchView.OnQueryTextListener,OnItemClickListener,OnItemLongClickListener {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -130,8 +131,7 @@ public class MainActivity extends AppCompatActivity
         snackBarMessageReceiver = new SnackBarReceiver();
     }
 
-    @Override
-    public void onDisplayPlaceOnMap(Place place) {
+    public void displayPlaceOnMap(Place place) {
         Log.d("onDisplayPlaceOnMap","Got Place " + place.getName());
         Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
         if (mapFrag != null) {
@@ -152,7 +152,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSharePlace(Place place) {
+    }
 
+    @Override
+    public void onRemoveFromFavorites(Place place) {
+
+    }
+
+    @Override
+    public void onItemClick(Place place) {
+        displayPlaceOnMap(place);
     }
 
 
@@ -404,29 +413,4 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
-    /*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        Log.d("onTouchEvent","Got event " + event.toString());
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            toggleActionBar();
-        }
-        return true;
-    }
-
-    private void toggleActionBar() {
-        ActionBar actionBar = getActionBar();
-
-        if(actionBar != null) {
-            if(actionBar.isShowing()) {
-                Log.d("toggleActionBar","Hiding the actionBar");
-                actionBar.hide();
-            }
-            else {
-                Log.d("toggleActionBar","Showing the actionBar");
-                actionBar.show();
-            }
-        }
-    }
-    */
 }

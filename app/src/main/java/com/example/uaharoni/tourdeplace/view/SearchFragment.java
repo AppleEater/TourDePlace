@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -15,22 +16,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import com.example.uaharoni.tourdeplace.controller.DividerItemDecoration;
+
 import com.example.uaharoni.tourdeplace.R;
+import com.example.uaharoni.tourdeplace.controller.DividerItemDecoration;
 import com.example.uaharoni.tourdeplace.controller.OnItemClickListener;
-import com.example.uaharoni.tourdeplace.controller.OnPlaceSelected;
+import com.example.uaharoni.tourdeplace.controller.OnItemLongClickListener;
 import com.example.uaharoni.tourdeplace.controller.PlacesAdapter;
 import com.example.uaharoni.tourdeplace.controller.SearchTBL;
 import com.example.uaharoni.tourdeplace.model.Place;
 
-public class SearchFragment extends Fragment implements OnItemClickListener {
+public class SearchFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
 
     private SearchTBL dbHelper;
     private SearchReceiver searchServiceReceiver;
     private PlacesAdapter recyclerAdapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    OnPlaceSelected mCallback;
+    //OnPlaceSelected mCallback;
+    OnItemClickListener itemClickListener;
+    OnItemLongClickListener itemLongClickListener;
+
 
 
     private String TAG = "SearchFrag";
@@ -44,10 +49,12 @@ public class SearchFragment extends Fragment implements OnItemClickListener {
         super.onAttach(context);
         // This makes sure that the container activity has implemented the callback interface. If not, it throws an exception
         try {
-            mCallback = (OnPlaceSelected) getActivity();
+            //mCallback = (OnPlaceSelected) getActivity();
+            itemClickListener = (OnItemClickListener) getActivity();
+            itemLongClickListener = (OnItemLongClickListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString()
-                    + " must implement OnHeadlineSelectedListener");
+                    + " must implement missing interface");
         }
     }
 
@@ -55,7 +62,6 @@ public class SearchFragment extends Fragment implements OnItemClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dbHelper = new SearchTBL(getContext());
-
         searchServiceReceiver = new SearchReceiver();
     }
 
@@ -72,7 +78,6 @@ public class SearchFragment extends Fragment implements OnItemClickListener {
         Log.d("SearchFrag", "Removing receivers");
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(searchServiceReceiver);
     }
-
 
 
     public class SearchReceiver extends BroadcastReceiver {
@@ -147,14 +152,34 @@ public class SearchFragment extends Fragment implements OnItemClickListener {
     }
     protected void refreshAdapter() {
         Log.d(TAG, "Refreshing RecyclerView adapter...");
-        recyclerAdapter = new PlacesAdapter(getContext(), dbHelper.getAllPlaces());
+        try {
+            recyclerAdapter = new PlacesAdapter(getContext(), dbHelper.getAllPlaces());
+        } catch (Exception e) {
+            Log.d(TAG,"Failed to create adapter. " + e.getMessage());
+        }
         recyclerAdapter.SetOnItemClickListener(this);
+        recyclerAdapter.SetOnItemLongClickListener(this);
         recyclerView.setAdapter(recyclerAdapter);
     }
     @Override
-    public void onItemClick(Place place) {
+    public void onItemClick(@NonNull Place place) {
         Log.d("onItemClick-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add marker at MapFragment");
         // Send the event to the host activity
-        mCallback.onDisplayPlaceOnMap(place);
+        itemClickListener.onItemClick(place);
     }
+    @Override
+    public void onAddToFavorites(@NonNull Place place) {
+        Log.d("onAddToFavorites-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add to Favorits");
+        itemLongClickListener.onAddToFavorites(place);
+    }
+
+    @Override
+    public void onSharePlace(@NonNull Place place) {
+    }
+
+    @Override
+    public void onRemoveFromFavorites(Place place) {
+
+    }
+
 }

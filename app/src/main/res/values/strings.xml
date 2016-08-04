@@ -10,6 +10,8 @@
 
     <!-- Popup  Menu String Search Frag-->
     <string name="add_to_favorites">Save in Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="popup_share">Share Place</string>
 
     <!-- Tab Strings -->
     <string name="tab_search">Search results</string>

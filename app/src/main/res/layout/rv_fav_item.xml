@@ -4,7 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5dp">
+    android:layout_marginTop="5dp"
+    android:id="@+id/rv_fav"
+    >
 
     <ImageView
         android:layout_width="48dp"
@@ -27,7 +29,7 @@
         android:layout_width="280sp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="35sp"
+        android:textSize="25sp"
         android:id="@+id/txtPlaceName"
         />
 
@@ -45,7 +47,7 @@
         android:layout_toEndOf="@+id/layout_placeInfo"
         android:layout_toRightOf="@+id/layout_placeInfo"
         android:orientation="vertical"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:foregroundGravity="fill_horizontal">
 
         <TextView
@@ -53,7 +55,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/txtPlaceDistance"
             android:textSize="15sp"
-            android:layout_gravity="end|center_horizontal" />
+            android:layout_gravity="end|center_horizontal|center_vertical" />
 
 
     </LinearLayout>

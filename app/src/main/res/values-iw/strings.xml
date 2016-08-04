@@ -49,4 +49,6 @@
     <string name="unit_system_km_value">ק״מ</string>
     <string name="unit_system_mi_value">מייל</string>
     <string name="add_to_favorites">שמור למועדפים</string>
+    <string name="popup_share">שלח מקום</string>
+    <string name="remove_from_favorites">הסר ממועדפים</string>
 </resources>
