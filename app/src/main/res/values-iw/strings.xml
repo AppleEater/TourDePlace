@@ -51,4 +51,6 @@
     <string name="add_to_favorites">שמור למועדפים</string>
     <string name="popup_share">שלח מקום</string>
     <string name="remove_from_favorites">הסר ממועדפים</string>
+    <string name="snackbar_message_added_to_favorites">מיקום נשמר במועדפים</string>
+    <string name="snackbar_message_removed_from_favorites">מיקום הוסר מהמועדפים</string>
 </resources>

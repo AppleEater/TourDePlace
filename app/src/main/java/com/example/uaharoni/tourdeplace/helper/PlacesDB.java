@@ -108,24 +108,26 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
 
         return place;
     }
-    protected long insertPlace(@NonNull Place place, @NonNull String tblName){
+    public long insertPlace(@NonNull Place place, @NonNull String tblName){
         long rowid=0;
         Log.d("insertPlace-PlacesDB","table: " + tblName + " -  Inserting Place " + place.getName() + "[" + place.getAddress().getAddLat() +"," + place.getAddress().getAddLong() + "]");
         ContentValues updatedValues = extractPlace(place);
         try{
             SQLiteDatabase db = this.getWritableDatabase();
-            rowid = db.insertOrThrow(tblName, null, updatedValues);
+            rowid = db.insertWithOnConflict(tblName,COL_NULLABLE,updatedValues,SQLiteDatabase.CONFLICT_IGNORE);
+           // rowid = db.insertOrThrow(tblName, null, updatedValues);
             db.close();
         } catch (Exception e) {
             Log.e("insertPlace-PlacesDB","Error Inserting " + place.getName() + " to table " + tblName + ". " + e.getMessage());
         }
+        Log.d("insertPlace-PlacesDB","Added place to row: " + rowid);
         return  rowid;
     }
-    protected int deletePlace(@NonNull Place place, @NonNull String tblName){
+    public int deletePlace(@NonNull Place place, @NonNull String tblName){
         int linesReturned = 0;
         long rowid = place.getId();
-        Log.d("deletePlace","Delete place " + place.getName() + " (" + rowid + ") from table " + tblName);
-        String where = COL_ID;
+        Log.d("deletePlace-PlacesDB","Delete place " + place.getName() + " (" + rowid + ") from table " + tblName);
+        String where = COL_ID + " =  ?";
         String[] whereArgs = {String.valueOf(rowid)};
         if(place != null) {
             try{
@@ -135,6 +137,7 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
             } catch (Exception e){
                 Log.e("deletePlace-PlacesDB","Error deleting place. " + e.getMessage());
             }
+            Log.d("deletePlace-PlacesDB","deleted rows: " + linesReturned);
         } else {
             return 0;
         }

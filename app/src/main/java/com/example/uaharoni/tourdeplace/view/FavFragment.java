@@ -125,34 +125,32 @@ public class FavFragment extends Fragment implements OnItemClickListener,OnItemL
             Log.d(TAG,"Failed to create adapter. " + e.getMessage());
         }
         recyclerAdapter.SetOnItemClickListener(this);
+        recyclerAdapter.SetOnItemLongClickListener(this);
         recyclerView.setAdapter(recyclerAdapter);
     }
     protected void addPlace(@NonNull Place place){
         Log.d("addPlace-FavFrag","Adding place " + place.getName() + "(gplaceId: " + place.getgPlaceId() + ") to FavDB");
         dbHelper.insertPlace(place);
-        Log.d("addPlace-FavFrag","Inserted to DB. Now refreshing the adapter...");
-        try{
-            recyclerAdapter.notifyDataSetChanged();
-        } catch (Exception e) {
-            Log.d("addPlace", "Error in adapter. " + e.getMessage());
-        }
-    }
-
-
-    @Override
-    public void onAddToFavorites(Place place) {
-        // Not needed
-    }
-
-    @Override
-    public void onSharePlace(Place place) {
-
+        Log.d("addPlace-FavFrag","Refreshing adapter");
+        refreshAdapter();
     }
 
     @Override
     public void onRemoveFromFavorites(Place place) {
         Log.d("deletePlace-FavFrag","Deleting place " + place.getName() + "(gplaceId: " + place.getgPlaceId() + ") from FavDB");
         dbHelper.deletePlace(place);
-        recyclerAdapter.notifyDataSetChanged();
+        Log.d("deletePlace-FavFrag","Refreshing adapter");
+        refreshAdapter();
     }
+    @Override
+    public void onAddToFavorites(Place place) {
+        // Not relevant
+    }
+
+    @Override
+    public void onSharePlace(Place place) {
+        Log.d("onSharePlace-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to share");
+        itemLongClickListener.onSharePlace(place);
+    }
+
 }

@@ -25,6 +25,9 @@
     <string name="snackbar_message_power_connected">Power is connected</string>
     <string name="snackbar_message_power_disconnected">Power is disconnected</string>
     <string name="snackbar_message_custom_intent_extra_text" translatable="false">SNACKBAR_MESSAGE</string>
+    <string name="snackbar_message_added_to_favorites">Location added to favorites</string>
+    <string name="snackbar_message_removed_from_favorites">Location removed from favorites</string>
+
 
 
     <!-- Map strings -->

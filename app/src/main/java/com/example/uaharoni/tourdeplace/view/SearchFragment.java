@@ -169,17 +169,19 @@ public class SearchFragment extends Fragment implements OnItemClickListener, OnI
     }
     @Override
     public void onAddToFavorites(@NonNull Place place) {
-        Log.d("onAddToFavorites-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add to Favorits");
+        Log.d("onAddToFavorites-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to add to Favorites");
         itemLongClickListener.onAddToFavorites(place);
     }
 
     @Override
     public void onSharePlace(@NonNull Place place) {
+        Log.d("onSharePlace-"+TAG,"Got Place " + place.getName() + ". Asking the parent activity to share");
+        itemLongClickListener.onSharePlace(place);
     }
 
     @Override
     public void onRemoveFromFavorites(Place place) {
-
+        // Not relevant
     }
 
 }

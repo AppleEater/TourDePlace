@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -49,7 +50,6 @@ public class MainActivity extends AppCompatActivity
     int searchFragId=-1,mapFragId=-1,favFragId=-1;
 
 
-
     private SnackBarReceiver snackBarMessageReceiver;
 
     public static LocationManager locationManager;
@@ -59,9 +59,8 @@ public class MainActivity extends AppCompatActivity
     private LocationProvider locProvLow,locProvHigh,locProvPassive;
 
 
-
-    private final long MIN_TIME_ms = 10000L;
-    private final float MIN_DISTANCE_m = 3f;
+    private final long MIN_TIME_ms = 0L;
+    private final float MIN_DISTANCE_m = 0f;
     public static Location currentLocation = null;
     private static final int LOCATION_REQUEST_CODE = 1;
     private static final int INTERNET_REQUEST_CODE = 2;
@@ -75,12 +74,9 @@ public class MainActivity extends AppCompatActivity
         locationHelper = new LocationHelper(this,locationManager);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-
         initReceivers();
         initToolBar();
         initTabs();
-
-        viewPager.setCurrentItem(favFragId);
 
 
         Log.d("onCreate-Main","Finished onCreate");
@@ -104,9 +100,11 @@ public class MainActivity extends AppCompatActivity
                 currentLocation.setLatitude(Double.parseDouble(latPref));
                 currentLocation.setLongitude(Double.parseDouble(longtPref));
                 Log.d("onResume-Main", "CurrentLocation: " + currentLocation.toString());
-               // Location dummyLoc = getLocationUpdates();
+               //Location dummyLoc = getLocationUpdates();
             }
         }
+        viewPager.setCurrentItem(mapFragId);
+
     }
 
     @Override
@@ -116,6 +114,7 @@ public class MainActivity extends AppCompatActivity
         Log.d("onPause","Removing receivers");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(snackBarMessageReceiver);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("onPause","Removing Location updates");
             locationManager.removeUpdates(this);
         }
         if(currentLocation != null){
@@ -147,16 +146,32 @@ public class MainActivity extends AppCompatActivity
         if(favFrag != null){
             Log.d("onAddToFavorites","Adding place " + place.getName() + " in Fav Fragment");
             favFrag.addPlace(place);
+            Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_added_to_favorites),Snackbar.LENGTH_SHORT).show();
+
         }
     }
 
     @Override
     public void onSharePlace(Place place) {
+        Log.d("onSharePlace-Main","Sharing place " + place.getName());
+
+  //      String uri = Uri.Builder().scheme("geo").appendPath(place.getAddress().getAddLat() +","+ place.getAddress().getAddLong()).appendQueryParameter("q", place.getAddress().getAddLat()+","+place.getAddress().getAddLong()).build();
+//        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(uri));
+        Uri gmmIntentUri = Uri.parse("geo:"+place.getAddress().getAddLat()+","+ place.getAddress().getAddLong()+"?q="+Uri.encode(place.getAddress().getName()));
+        Intent intent = new Intent(Intent.ACTION_VIEW,gmmIntentUri);
+        intent.setPackage("com.google.android.apps.maps");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            //startActivity(intent);
+            startActivity(Intent.createChooser(intent, "Share via"));
+
+        }
+
+        //startActivity(Intent.createChooser(intent, "Share via"));
     }
 
     @Override
     public void onRemoveFromFavorites(Place place) {
-
+        //Not used
     }
 
     @Override
@@ -333,16 +348,16 @@ public class MainActivity extends AppCompatActivity
             Log.d("getLocation", "Getting provider Low");
             locProvLow =
                     locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createCoarseCriteria(), true));
-            Log.d("getLocation", "Getting provider High");
-            locProvHigh =
+            //Log.d("getLocation", "Getting provider High");
+           // locProvHigh =
                     locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createFineCriteria(), true));
             Log.d("getLocation", "Checking if providers exist...");
             if (locProvHigh == null && locProvLow == null && locProvPassive == null) {
                 Log.d("getLocation", "No providers exist. Alerting");
                 locationHelper.showLocationSettingsAlert();
             } else {
-                Log.d("getLocation", "High access providers exist. Getting currentLocation");
-                locationManager.requestLocationUpdates(locProvHigh.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
+                Log.d("getLocation", "Providers exist. Getting currentLocation");
+                locationManager.requestLocationUpdates(locProvLow.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
                 lastKnownLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
             }
         }

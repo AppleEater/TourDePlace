@@ -150,7 +150,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
 
     @Override
     public boolean onLongClick(View view) {
-        Log.d("onLongClick","LongClick on view " + view.getId() + " on root " + view.getRootView().getId());
+        Log.d("onLongClick","LongClick on view " + view.getId());
 
         PopupMenu popup = new PopupMenu(context,view);
         switch (view.getId()){
@@ -188,6 +188,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
                     break;
                 case R.id.fav_frag_remove_from_favorites:
                     Log.d("onMenuItemClick","Remove place " + selectedPlace.getName() + " from Favorites");
+                    itemLongClickListener.onRemoveFromFavorites(selectedPlace);
                     break;
             }
         } else {
