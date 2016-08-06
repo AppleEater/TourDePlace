@@ -144,7 +144,6 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
 
         returnString = String.format(Locale.getDefault(),"%.2f %s",distanceLocalized, distanceString);
 
-        //distanceLocalized = distanceLocalized.concat(" " + distanceString);
         Log.d("getDistanceString", "Converted distance: " + returnString);
 
         return returnString;
