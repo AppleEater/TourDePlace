@@ -102,6 +102,15 @@ public class MainActivity extends AppCompatActivity
         } else {
             viewPager.setCurrentItem(mapFragId);
         }
+        if(currentLocation == null){
+            Log.d("onResume-Main","No real location from the providers. We'll fake it from the preferences...");
+            String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
+            String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
+            currentLocation = new Location(getString(R.string.search_service_location_name));
+            currentLocation.setLatitude(Double.parseDouble(latPref));
+            currentLocation.setLongitude(Double.parseDouble(longtPref));
+            Log.d("onResume-Main", "CurrentLocation from preferences: " + currentLocation.toString());
+        }
 
         Log.d("onResume-Main", "Finished onResume");
     }
@@ -277,10 +286,16 @@ public class MainActivity extends AppCompatActivity
             Log.d("onLocChanged","Updating the location in the search fragment");
             searchFrag.refreshAdapter();
         }
+        FavFragment favFrag = (FavFragment)((ViewPagerAdapter)viewPager.getAdapter()).getItem(favFragId);
+        if(favFrag != null){
+            Log.d("onLocChanged","Updating the location in the favorites fragment");
+            favFrag.refreshAdapter();
+        }
     }
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
+        Log.d("onStatusChanged","Provider " + s + " changed status to " + bundle.toString());
     }
 
     @Override
@@ -305,13 +320,16 @@ public class MainActivity extends AppCompatActivity
         if(currentLocation != null){
             Log.d("searchPlaces","We have a real location from the providers");
         } else {
-            Log.d("searchPlaces","No real location from the providers. We'll fake it from the preferences...");
+            Log.w("searchPlaces","No location from the providers");
+            return;
+            /*
             String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
             String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
             currentLocation = new Location(getString(R.string.search_service_location_name));
             currentLocation.setLatitude(Double.parseDouble(latPref));
             currentLocation.setLongitude(Double.parseDouble(longtPref));
             Log.d("searchPlaces", "CurrentLocation: " + currentLocation.toString());
+            */
         }
         String searchRadius = sharedPreferences.getString(getString(R.string.settings_searchRadius_key),getString(R.string.settings_searchRadius_value_500));
         searchRadiusM = locationHelper.getRadiusinM(searchRadius);

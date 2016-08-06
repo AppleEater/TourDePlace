@@ -61,7 +61,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
         if(itemView != null){
             return (new CommonViewHolder(itemView));
         } else {
-            Log.d("onCreateViewHolder", "Parent view not found.");
+            Log.w("onCreateViewHolder", "Parent view not found.");
             return null;
         }
     }
@@ -69,7 +69,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
     @Override
     public void onBindViewHolder(CommonViewHolder holder, int position) {
         Place currentplace = places.get(position);
-        Log.d("onBindViewHolder","Got place " + currentplace.getName() + " [" + currentplace.getAddress().getAddLat() + "," + currentplace.getAddress().getAddLong() + "]  at position " + position);
+        //Log.d("onBindViewHolder","Got place " + currentplace.getName() + " [" + currentplace.getAddress().getAddLat() + "," + currentplace.getAddress().getAddLong() + "]  at position " + position);
         holder.bind(currentplace);
     }
 
@@ -92,7 +92,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
             String TAG = "CommonViewHolder";
             context = itemView.getContext();
 
-            Log.d(TAG, "Initializing " + TAG + " with parent " + itemView.getId());
+            //Log.d(TAG, "Initializing " + TAG + " with parent " + itemView.getId());
             txtPlaceName = (TextView) itemView.findViewById(R.id.txtPlaceName);
             txtPlaceAddress = (TextView) itemView.findViewById(R.id.txtPlaceAddress);
             iVPlaceImage = (ImageView) itemView.findViewById(R.id.iv_placeIcon);
@@ -104,7 +104,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
 
         }
         public void bind(Place remotePlace){
-            Log.d("bind", "Showing remote place " + remotePlace.getName() + "[" + remotePlace.getAddress().getAddLat() + "," + remotePlace.getAddress().getAddLong() + "]");
+           // Log.d("bind", "Showing remote place " + remotePlace.getName() + "[" + remotePlace.getAddress().getAddLat() + "," + remotePlace.getAddress().getAddLong() + "]");
             txtPlaceName.setText(remotePlace.getName());
             txtPlaceAddress.setText(remotePlace.getAddress().getName());
             if(MainActivity.currentLocation != null){
@@ -125,13 +125,13 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
         float distanceLocalized;
         String distanceString, returnString;
         Location homeLocation = MainActivity.currentLocation;
-        Log.d("getDistanceString", "Home Location: " + homeLocation.toString());
+        //Log.d("getDistanceString", "Home Location: " + homeLocation.toString());
         Location remoteLocation = new Location(remotePlace.getName());
         remoteLocation.setLatitude(remotePlace.getAddress().getAddLat());
         remoteLocation.setLongitude(remotePlace.getAddress().getAddLong());
-        Log.d("getDistanceString", "Remote Location: " + remoteLocation.toString());
+        //Log.d("getDistanceString", "Remote Location: " + remoteLocation.toString());
         float distanceMeters = homeLocation.distanceTo(remoteLocation);
-        Log.d("getDistanceString", "Calculated distance: " + distanceMeters);
+        //Log.d("getDistanceString", "Calculated distance: " + distanceMeters);
         //TODO: Implement Google Maps Direction API (https://developers.google.com/maps/documentation/directions/)
         String distanceUnit = MainActivity.sharedPreferences.getString(context.getString(R.string.settings_distance_units_key), context.getString(R.string.unit_system_km));
         if (distanceUnit.equals(context.getString(R.string.unit_system_km))) {
@@ -144,14 +144,14 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
 
         returnString = String.format(Locale.getDefault(),"%.2f %s",distanceLocalized, distanceString);
 
-        Log.d("getDistanceString", "Converted distance: " + returnString);
+        //Log.d("getDistanceString", "Converted distance: " + returnString);
 
         return returnString;
     }
 
     @Override
     public boolean onLongClick(View view) {
-        Log.d("onLongClick","LongClick on view " + view.getId());
+        //Log.d("onLongClick","LongClick on view " + view.getId());
 
         PopupMenu popup = new PopupMenu(context,view);
         switch (view.getId()){
@@ -176,7 +176,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         Place selectedPlace = places.get(getLayoutPosition());
-        Log.d("onMenuItemClick","Clicked item " + item.getTitle() + " for place " + selectedPlace.getName());
+       // Log.d("onMenuItemClick","Clicked item " + item.getTitle() + " for place " + selectedPlace.getName());
         if(itemLongClickListener != null){
             switch (item.getItemId()) {
                 case R.id.search_frag_add_to_favorites:
@@ -202,7 +202,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
     @Override
     public void onClick(@NonNull View view) {
         int position = getLayoutPosition();
-        Log.d("onClick-ViewHolder","Clicked item number " + position);
+        //Log.d("onClick-ViewHolder","Clicked item number " + position);
         Place selectedPlace = places.get(position);
         Log.d("onClick-ViewHolder","Got place " + selectedPlace.getName() + ". Calling parent fragment...");
         if(itemClickListener != null) {
