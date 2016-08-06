@@ -107,7 +107,9 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
             Log.d("bind", "Showing remote place " + remotePlace.getName() + "[" + remotePlace.getAddress().getAddLat() + "," + remotePlace.getAddress().getAddLong() + "]");
             txtPlaceName.setText(remotePlace.getName());
             txtPlaceAddress.setText(remotePlace.getAddress().getName());
-            txtPlaceDistance.setText(getDistanceString(remotePlace));
+            if(MainActivity.currentLocation != null){
+                txtPlaceDistance.setText(getDistanceString(remotePlace));
+            }
             if (iVPlaceImage != null) {
                 Picasso.with(context)
                         .load(remotePlace.getPlaceIconUrl())
