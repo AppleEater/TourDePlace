@@ -48,7 +48,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.CommonView
 
     @Override
     public CommonViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        Log.d("onCreateViewHolder","Got view from parent " + parent.getId());
+        Log.d("onCreateViewHolder","Initializing");
         View itemView = null;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (parent.getId()){

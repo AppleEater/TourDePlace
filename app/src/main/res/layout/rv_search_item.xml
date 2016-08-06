@@ -36,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/txtPlaceAddress"
+            android:textSize="20sp"
             />
 
     </LinearLayout>
@@ -50,7 +51,7 @@
         >
 
         <TextView
-            android:layout_width="50sp"
+            android:layout_width="70sp"
             android:layout_height="wrap_content"
             android:id="@+id/txtPlaceDistance"
             android:textSize="15sp"

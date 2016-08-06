@@ -115,7 +115,6 @@ public abstract class PlacesDB extends SQLiteOpenHelper implements BaseColumns {
         try{
             SQLiteDatabase db = this.getWritableDatabase();
             rowid = db.insertWithOnConflict(tblName,COL_NULLABLE,updatedValues,SQLiteDatabase.CONFLICT_IGNORE);
-           // rowid = db.insertOrThrow(tblName, null, updatedValues);
             db.close();
         } catch (Exception e) {
             Log.e("insertPlace-PlacesDB","Error Inserting " + place.getName() + " to table " + tblName + ". " + e.getMessage());

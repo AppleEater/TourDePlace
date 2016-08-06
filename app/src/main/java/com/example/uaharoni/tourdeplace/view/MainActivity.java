@@ -12,7 +12,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -31,7 +30,6 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.uaharoni.tourdeplace.R;
 import com.example.uaharoni.tourdeplace.controller.OnItemClickListener;
@@ -59,11 +57,10 @@ public class MainActivity extends AppCompatActivity
     private LocationProvider locProvLow,locProvHigh,locProvPassive;
 
 
-    private final long MIN_TIME_ms = 0L;
-    private final float MIN_DISTANCE_m = 0f;
+    private final long MIN_TIME_ms = 5000L;
+    private final float MIN_DISTANCE_m = 10f;
     public static Location currentLocation = null;
     private static final int LOCATION_REQUEST_CODE = 1;
-    private static final int INTERNET_REQUEST_CODE = 2;
 
 
     @Override
@@ -78,47 +75,48 @@ public class MainActivity extends AppCompatActivity
         initToolBar();
         initTabs();
 
-
         Log.d("onCreate-Main","Finished onCreate");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("onResume-Main","onResume started.");
+        Log.d("onResume-Main","Registering snackBar receiver.");
         LocalBroadcastManager.getInstance(this).registerReceiver(snackBarMessageReceiver,new IntentFilter(getString(R.string.power_receiver_custom_intent_action)));
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            currentLocation = getLocationUpdates();
-
-            // This is a double check in case the getLocationUpdates returns no location
-            if(currentLocation == null) {
-                Log.d("onResume-Main", "No current location. Using from Preferences");
-                String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
-                String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
-                currentLocation = new Location(getString(R.string.search_service_location_name));
-                currentLocation.setLatitude(Double.parseDouble(latPref));
-                currentLocation.setLongitude(Double.parseDouble(longtPref));
-                Log.d("onResume-Main", "CurrentLocation: " + currentLocation.toString());
-               //Location dummyLoc = getLocationUpdates();
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            Log.d("onResume-Main","Permissions approved. Checking for providers...");
+            if (getProviders()) {
+                Log.d("onResume-Main", "Providers exist. Getting currentLocation...");
+                if (locProvPassive != null) {
+                    Log.d("onResume-Main", "Requesting location from Passive Providers");
+                    locationManager.requestLocationUpdates(locProvPassive.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
+                }
+                if (locProvLow != null) {
+                    Log.d("onResume-Main", "Requesting location from Low Providers");
+                    locationManager.requestLocationUpdates(locProvLow.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
+                }
             }
+            viewPager.setCurrentItem(searchFragId);
+        } else {
+            viewPager.setCurrentItem(mapFragId);
         }
-        viewPager.setCurrentItem(mapFragId);
 
+        Log.d("onResume-Main", "Finished onResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("onPause","onPause started.");
-        Log.d("onPause","Removing receivers");
+        Log.d("onPause-Main","Removing receivers");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(snackBarMessageReceiver);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("onPause","Removing Location updates");
+            Log.d("onPause-Main","Removing Location updates");
             locationManager.removeUpdates(this);
         }
         if(currentLocation != null){
-            Log.d("onPause","Saving last location to Prefs.");
+            Log.d("onPause-Main","Saving last location to Prefs.");
             sharedPreferences.edit()
                     .putString(getString(R.string.settings_last_location_latitude),String.valueOf(currentLocation.getLatitude()))
                     .putString(getString(R.string.settings_last_location_longitude),String.valueOf(currentLocation.getLongitude()))
@@ -147,7 +145,6 @@ public class MainActivity extends AppCompatActivity
             Log.d("onAddToFavorites","Adding place " + place.getName() + " in Fav Fragment");
             favFrag.addPlace(place);
             Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_added_to_favorites),Snackbar.LENGTH_SHORT).show();
-
         }
     }
 
@@ -155,18 +152,12 @@ public class MainActivity extends AppCompatActivity
     public void onSharePlace(Place place) {
         Log.d("onSharePlace-Main","Sharing place " + place.getName());
 
-  //      String uri = Uri.Builder().scheme("geo").appendPath(place.getAddress().getAddLat() +","+ place.getAddress().getAddLong()).appendQueryParameter("q", place.getAddress().getAddLat()+","+place.getAddress().getAddLong()).build();
-//        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(uri));
         Uri gmmIntentUri = Uri.parse("geo:"+place.getAddress().getAddLat()+","+ place.getAddress().getAddLong()+"?q="+Uri.encode(place.getAddress().getName()));
         Intent intent = new Intent(Intent.ACTION_VIEW,gmmIntentUri);
         intent.setPackage("com.google.android.apps.maps");
         if (intent.resolveActivity(getPackageManager()) != null) {
-            //startActivity(intent);
             startActivity(Intent.createChooser(intent, "Share via"));
-
         }
-
-        //startActivity(Intent.createChooser(intent, "Share via"));
     }
 
     @Override
@@ -195,7 +186,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-    }
+    }   //End of class SnackBarReceiver
+
     private void initToolBar(){
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -209,7 +201,6 @@ public class MainActivity extends AppCompatActivity
         favFragId  = viewPagerAdapter.addFragment(new FavFragment(),getString(R.string.tab_favorites));
         mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
         searchFragId  = viewPagerAdapter.addFragment(new SearchFragment(),getString(R.string.tab_search));
-
 
 
         Log.d("initTabs","Connecting the tabs to the Adapter");
@@ -246,8 +237,6 @@ public class MainActivity extends AppCompatActivity
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setOnQueryTextListener(this);
 
-        //MenuItem searchAny = menu.findItem(R.id .action_search_any);
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -262,8 +251,8 @@ public class MainActivity extends AppCompatActivity
                         .commit();
                 return true;
             case R.id.action_search_any:
+                setLocationRequest();
                 viewPager.setCurrentItem(searchFragId);
-                searchGooglePlaces();
                 return true;
             case R.id.action_feedback:
                 return true;
@@ -306,119 +295,134 @@ public class MainActivity extends AppCompatActivity
         searchTerm = query.trim();
         searchView.clearFocus();
         Log.d("onQuerySubmit","Query string: " + query);
+        setLocationRequest();
         viewPager.setCurrentItem(searchFragId);
-        searchGooglePlaces();
-
 
         return true;
     }
-    private void searchGooglePlaces(){
+    private void searchPlaces(){
         long searchRadiusM = 0;
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            getLocationPermissions();
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("searchGooglePlaces","No permission to access the network. Requesting permissions");
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.INTERNET},INTERNET_REQUEST_CODE);
+        if(currentLocation != null){
+            Log.d("searchPlaces","We have a real location from the providers");
         } else {
-            Log.d("searchGooglePlaces","Internet permissions exist. Getting locationUpdates");
-            Location currentLoc =  getLocationUpdates();
-            Log.d("searchGooglePlaces","Returned to searchGooglePlace. Getting info from Preferences");
-            String searchRadius = sharedPreferences.getString(getString(R.string.settings_searchRadius_key),getString(R.string.settings_searchRadius_value_500));
-            searchRadiusM = locationHelper.getRadiusinM(searchRadius);
-            Intent serviceSearch = new Intent(this,com.example.uaharoni.tourdeplace.controller.SearchGplace.class);
-            serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),searchTerm);
-            serviceSearch.putExtra(getString(R.string.search_service_intent_search_radius_m_extra), Long.toString(searchRadiusM));
-            serviceSearch.putExtra(getString(R.string.search_service_intent_location_name_extra),currentLocation.getProvider());
-            serviceSearch.putExtra(getString(R.string.search_service_intent_location_extra),new double[] {currentLoc.getLatitude(),currentLoc.getLongitude()});
-            Log.d("searchGooglePlaces","Sending location: " + currentLoc.toString());
-            Log.d("searchGooglePlaces","We have permissions. Starting the search service");
-            startService(serviceSearch);
+            Log.d("searchPlaces","No real location from the providers. We'll fake it from the preferences...");
+            String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
+            String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
+            currentLocation = new Location(getString(R.string.search_service_location_name));
+            currentLocation.setLatitude(Double.parseDouble(latPref));
+            currentLocation.setLongitude(Double.parseDouble(longtPref));
+            Log.d("searchPlaces", "CurrentLocation: " + currentLocation.toString());
         }
+        String searchRadius = sharedPreferences.getString(getString(R.string.settings_searchRadius_key),getString(R.string.settings_searchRadius_value_500));
+        searchRadiusM = locationHelper.getRadiusinM(searchRadius);
+        Intent serviceSearch = new Intent(this,com.example.uaharoni.tourdeplace.controller.SearchGplace.class);
+        serviceSearch.putExtra(getString(R.string.search_service_intent_query_extra),searchTerm);
+        serviceSearch.putExtra(getString(R.string.search_service_intent_search_radius_m_extra), Long.toString(searchRadiusM));
+        serviceSearch.putExtra(getString(R.string.search_service_intent_location_name_extra),currentLocation.getProvider());
+        serviceSearch.putExtra(getString(R.string.search_service_intent_location_extra),new double[] {currentLocation.getLatitude(),currentLocation.getLongitude()});
+        Log.d("searchGooglePlaces","Sending location: " + currentLocation.toString());
+        Log.d("searchGooglePlaces","Starting the search service");
+        startService(serviceSearch);
     }
-    private Location getLocationUpdates() {
-        Location tempLocation = null;
+
+    private void setLocationRequest() {
         Location lastKnownLocation = null;
-        Log.d("getLocation", "Obtaining providers");
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("getLocation", "Getting provider Passive");
-            locProvPassive =
-                    locationManager.getProvider(LocationManager.PASSIVE_PROVIDER);
-            Log.d("getLocation", "Getting provider Low");
-            locProvLow =
-                    locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createCoarseCriteria(), true));
-            //Log.d("getLocation", "Getting provider High");
-           // locProvHigh =
-                    locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createFineCriteria(), true));
-            Log.d("getLocation", "Checking if providers exist...");
-            if (locProvHigh == null && locProvLow == null && locProvPassive == null) {
-                Log.d("getLocation", "No providers exist. Alerting");
-                locationHelper.showLocationSettingsAlert();
-            } else {
-                Log.d("getLocation", "Providers exist. Getting currentLocation");
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)
+                )
+        {
+            Log.d("setLocationRequest","No Permissions for location or internet. Requesting...");
+            getPermissions();
+        } else {
+            Log.d("setLocationRequest", "We have all the permissions needed. Requesting providers...");
+            if (!getProviders()) {
+                Log.e("setLocationRequest", "No location providers are enabled...");
+                Snackbar.make(findViewById(R.id.main_content),"Location is disabled",Snackbar.LENGTH_LONG);
+                return;
+            }
+            Log.d("setLocationRequest", "Providers exist. Getting currentLocation");
+            if (locProvLow != null) {
+                Log.d("setLocationRequest", "Requesting location from lowProvider");
                 locationManager.requestLocationUpdates(locProvLow.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
                 lastKnownLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
+                if (lastKnownLocation != null) {
+                    Log.d("setLocationRequest", "Got lastKnowLocation from lowProvider. Running searchPlaces");
+                    currentLocation = lastKnownLocation;
+                    searchPlaces();
+                } else {
+                    Log.d("setLocationRequest", "No last known location from lowProvider");
+                }
+            } else if (locProvPassive != null) {
+                Log.d("setLocationRequest", "Requesting location from passiveProvider");
+                locationManager.requestLocationUpdates(locProvLow.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
+                lastKnownLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
+                if (lastKnownLocation != null) {
+                    Log.d("setLocationRequest", "Got last known location from locProvPassive. Running searchPlaces");
+                    currentLocation = lastKnownLocation;
+                    searchPlaces();
+                } else {
+                    Log.d("setLocationRequest", "No last known location from locProvPassive");
+                    Snackbar.make(findViewById(R.id.main_content),"Location unknown....",Snackbar.LENGTH_LONG);
+                }
             }
         }
-        if(lastKnownLocation != null){
-            tempLocation = lastKnownLocation;
-        } else {
-            if(currentLocation != null){
-                Log.d("getLocation","Using currentLocation from Preferences.");
-                tempLocation = currentLocation;
-            }
-
-        }
-        if(tempLocation != null){
-            Log.d("getLocationUpdates","Returned location: " + tempLocation.toString());
-        }
-        return tempLocation;
     }
-
-    private void getLocationPermissions(){
-        if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
-            Log.d("getLocPermsns","Explain to the user why we need to get location");
-            Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_location_permissions_needed),Snackbar.LENGTH_INDEFINITE)
-                    .setAction(getString(R.string.snackbar_action_ok), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Log.d("getLocPermsns","Requesting permissions after Snackbar message");
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST_CODE);
-                            }
-                        }
-                    })
+    private boolean getProviders() {
+        boolean providerSuccess = true;
+        Log.d("getProviders", "Getting provider Passive");
+        locProvPassive =
+                locationManager.getProvider(LocationManager.PASSIVE_PROVIDER);
+        Log.d("getProviders", "Getting provider Low");
+        locProvLow =
+                locationManager.getProvider(locationManager.getBestProvider(LocationHelper.createCoarseCriteria(), true));
+        Log.d("getProviders", "Checking if providers exist...");
+        if (locProvHigh == null && locProvLow == null && locProvPassive == null) {
+            Log.d("getLocation", "No providers exist. Alerting");
+            locationHelper.showLocationSettingsAlert();
+            providerSuccess = false;
+        }
+        return providerSuccess;
+    }
+    private void getPermissions(){
+        String []permissions =new String[] {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.INTERNET};
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)
+                ||
+                ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.INTERNET)
+                ){
+            Log.d("getPermissions","Explain to the user why we need to get these permissions");
+            Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_location_permissions_needed),Snackbar.LENGTH_LONG)
                     .show();
-        } else {
-            Log.d("getLocPermsns","Requesting permissions after checking for rationale");
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST_CODE);
         }
-    }
+        ActivityCompat.requestPermissions(this,permissions,LOCATION_REQUEST_CODE);
+        }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull final String[] permissions, @NonNull int[] grantResults) {
-        Log.d("RequestPerms", "Got grantResult " + grantResults[0] + " for permission " + permissions[0]);
-        switch (requestCode) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        boolean permissionDenied = false;
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
             case LOCATION_REQUEST_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("RequestPerms", "Permission granted. Running");
-                    searchGooglePlaces();
+                if(grantResults.length==0){
+                    Log.d("onRqustPermssonsReslt","Location permissions request was cancelled");
+                    permissionDenied = true;
                 } else {
-                    Log.d("RequestPerms", "Location Permissions denied on API>=23");
-                    Snackbar.make(findViewById(R.id.main_content),getString(R.string.snackbar_message_no_location_permissions),Snackbar.LENGTH_LONG).show();
+                    int i = 0;
+                    while (i < grantResults.length && !permissionDenied) {
+                        permissionDenied = (grantResults[i] != PackageManager.PERMISSION_GRANTED);
+                        i++;
+                    }
+                    if (permissionDenied) {
+                        Log.d("onRqustPermssonsReslt", "Permission " + permissions[i - 1] + " was denied!");
+                    }
                 }
-                break;
-            case INTERNET_REQUEST_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("RequestPerms","Internet permission granted.");
-                    searchGooglePlaces();
+                if(permissionDenied){
+                        Log.e("onRqustPermssonsReslt","No permissions granted. Can't continue.");
+                    Snackbar.make(findViewById(R.id.main_content),R.string.snackbar_message_location_permissions_needed,Snackbar.LENGTH_LONG).show();
                 } else {
-                    Log.d("RequestPerms","Internet permissions denied");
+                    Log.d("onRqustPermssonsReslt","All permissions are good. Continue");
+                    searchPlaces();
                 }
-                break;
-            default:
-                Log.d("RequestPerms", "No requestCode. Falling back");
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
         }
     }

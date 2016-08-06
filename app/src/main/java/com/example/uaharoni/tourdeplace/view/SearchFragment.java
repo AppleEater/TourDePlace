@@ -49,7 +49,6 @@ public class SearchFragment extends Fragment implements OnItemClickListener, OnI
         super.onAttach(context);
         // This makes sure that the container activity has implemented the callback interface. If not, it throws an exception
         try {
-            //mCallback = (OnPlaceSelected) getActivity();
             itemClickListener = (OnItemClickListener) getActivity();
             itemLongClickListener = (OnItemLongClickListener) getActivity();
         } catch (ClassCastException e) {

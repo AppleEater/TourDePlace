@@ -69,8 +69,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("onResume-MapFrag", "Map has permissions for location");
             if(mMap != null){
+                Log.d("onResume-MapFrag", "Map has permissions for location. Setting location...");
                 mMap.setMyLocationEnabled(true);
                 setCurrentLocation(MainActivity.currentLocation);
             }
@@ -119,7 +119,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
                         );
             if(mMap != null){
-                    Log.d("setCurLoc-MapFrag","Adding Marker");
+                    Log.d("setCurLoc-MapFrag","Adding Marker for current location");
                     currentLocationMarker = mMap.addMarker(markerOptions);
             }
         }
