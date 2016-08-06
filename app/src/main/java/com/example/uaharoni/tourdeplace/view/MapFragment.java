@@ -102,7 +102,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void setCurrentLocation(@Nullable Location updatedLocation) {
-        if(updatedLocation != null){
+        if(updatedLocation != null  && isAdded()){
             Log.d("setCurrntLcatn-MapFrag", "Moving to location: " + updatedLocation.toString());
             LatLng geoCoordinates = new LatLng(updatedLocation.getLatitude(),updatedLocation.getLongitude());
             refreshMap(geoCoordinates);
