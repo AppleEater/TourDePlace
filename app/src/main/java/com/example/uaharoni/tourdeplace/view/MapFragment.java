@@ -147,6 +147,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .title(name)
                 .alpha(0.9f)
                 .snippet(address)
+                .draggable(false)
                  .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         if(mMap != null){
             Log.d("addPlaceMarker-MapFrag", "Display Marker");
