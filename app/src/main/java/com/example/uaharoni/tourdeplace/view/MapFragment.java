@@ -22,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -84,6 +85,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
         Location mapLocation = null;
 
+
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.setBuildingsEnabled(false);
         mMap.setIndoorEnabled(true);
@@ -102,6 +104,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void setCurrentLocation(@Nullable Location updatedLocation) {
+        double radiusInMeters = 500.0; //TODO: Change according to preferences
+        int strokeColor = 0xffff0000; //red outline
+        int shadeColor = 0x44ff0000; //opaque red fill
+
         if(updatedLocation != null  && isAdded()){
             Log.d("setCurrntLcatn-MapFrag", "Moving to location: " + updatedLocation.toString());
             LatLng geoCoordinates = new LatLng(updatedLocation.getLatitude(),updatedLocation.getLongitude());
@@ -118,9 +124,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         .icon(BitmapDescriptorFactory
                                 .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
                         );
+            CircleOptions circleOptions = new CircleOptions()
+                        .center(geoCoordinates)
+                        .radius(radiusInMeters)
+                        .fillColor(shadeColor)
+                        .strokeColor(strokeColor)
+                        .strokeWidth(2f);
+
             if(mMap != null){
                     Log.d("setCurLoc-MapFrag","Adding Marker for current location");
                     currentLocationMarker = mMap.addMarker(markerOptions);
+               // Circle mCircle = mMap.addCircle(circleOptions);
+
             }
         }
     }

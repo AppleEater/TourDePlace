@@ -322,14 +322,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             Log.w("searchPlaces","No location from the providers");
             return;
-            /*
-            String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
-            String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
-            currentLocation = new Location(getString(R.string.search_service_location_name));
-            currentLocation.setLatitude(Double.parseDouble(latPref));
-            currentLocation.setLongitude(Double.parseDouble(longtPref));
-            Log.d("searchPlaces", "CurrentLocation: " + currentLocation.toString());
-            */
         }
         String searchRadius = sharedPreferences.getString(getString(R.string.settings_searchRadius_key),getString(R.string.settings_searchRadius_value_500));
         searchRadiusM = locationHelper.getRadiusinM(searchRadius);
