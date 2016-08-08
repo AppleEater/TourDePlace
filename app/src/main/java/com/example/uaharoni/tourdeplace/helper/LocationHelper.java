@@ -24,8 +24,8 @@ public class LocationHelper {
         this.context = context;
     }
     public void showLocationSettingsAlert() {
-        //TODO: switch toDialogFragment
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        Log.d("showLocationSttngsAlrt","Display alert to user");
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle(context.getString(R.string.alert_dialog_title))
                 .setCancelable(true)
                 .setMessage(context.getString(R.string.alert_dialog_text))

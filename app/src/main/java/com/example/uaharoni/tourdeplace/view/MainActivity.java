@@ -357,11 +357,11 @@ public class MainActivity extends AppCompatActivity
                 locationManager.requestLocationUpdates(locProvLow.getName(), MIN_TIME_ms, MIN_DISTANCE_m, this);
                 lastKnownLocation = locationManager.getLastKnownLocation(locProvPassive.getName());
                 if (lastKnownLocation != null) {
-                    Log.d("setLocationRequest", "Got lastKnowLocation from lowProvider. Running searchPlaces");
+                    Log.d("setLocationRequest", "Got last known location from lowProvider. Running searchPlaces");
                     currentLocation = lastKnownLocation;
-                    searchPlaces();
                 } else {
-                    Log.d("setLocationRequest", "No last known location from lowProvider");
+                    Log.w("setLocationRequest", "No last known location from lowProvider");
+                    Snackbar.make(findViewById(R.id.main_content),"Location unknown. using last saved location",Snackbar.LENGTH_LONG).show();
                 }
             } else if (locProvPassive != null) {
                 Log.d("setLocationRequest", "Requesting location from passiveProvider");
@@ -370,12 +370,21 @@ public class MainActivity extends AppCompatActivity
                 if (lastKnownLocation != null) {
                     Log.d("setLocationRequest", "Got last known location from locProvPassive. Running searchPlaces");
                     currentLocation = lastKnownLocation;
-                    searchPlaces();
                 } else {
-                    Log.d("setLocationRequest", "No last known location from locProvPassive");
-                    Snackbar.make(findViewById(R.id.main_content),"Location unknown....",Snackbar.LENGTH_LONG);
+                    Log.w("setLocationRequest", "No last known location from locProvPassive");
+                    Snackbar.make(findViewById(R.id.main_content),"Location unknown. using last saved location",Snackbar.LENGTH_LONG).show();
                 }
             }
+            if(lastKnownLocation == null){
+                Log.d("setLocationRequest","No real location from the providers. We'll fake it from the preferences...");
+                String latPref = sharedPreferences.getString(getString(R.string.settings_last_location_latitude), "31.7767189");
+                String longtPref = sharedPreferences.getString(getString(R.string.settings_last_location_longitude), "35.2323145");
+                currentLocation = new Location(getString(R.string.search_service_location_name));
+                currentLocation.setLatitude(Double.parseDouble(latPref));
+                currentLocation.setLongitude(Double.parseDouble(longtPref));
+                Log.d("setLocationRequest", "CurrentLocation from preferences: " + currentLocation.toString());
+            }
+            searchPlaces();
         }
     }
     private boolean getProviders() {
