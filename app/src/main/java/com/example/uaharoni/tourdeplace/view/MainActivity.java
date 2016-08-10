@@ -18,7 +18,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private TabLayout tabLayout;
     ViewPager viewPager;
+    FragmentManager manager;
+    private MapFragment mapFragment;
     private SearchView searchView;
     int searchFragId=-1,mapFragId=-1,favFragId=-1;
 
@@ -138,12 +141,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void displayPlaceOnMap(Place place) {
-        Log.d("onDisplayPlaceOnMap","Got Place " + place.getName());
-        Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
-        if (mapFrag != null) {
+        //Log.d("onDisplayPlaceOnMap","Got Place " + place.getName());
+        if(getResources().getBoolean(R.bool.twoPaneMode)){
+            mapFragment = (MapFragment) manager.findFragmentById(R.id.fragment_map);
+        } else {
+            mapFragment = (MapFragment) ((ViewPagerAdapter)viewPager.getAdapter()).getItem(mapFragId);
+            //Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
+        }
+        if (mapFragment != null) {
             Log.d("onDisplayPlaceOnMap", "Display marker in the map fragment");
-            ((MapFragment) mapFrag).addPlaceMarker(place);
-            viewPager.setCurrentItem(mapFragId);
+            mapFragment.addPlaceMarker(place);
+            //viewPager.setCurrentItem(mapFragId);
         }
     }
 
@@ -202,34 +210,46 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
     }
     private void initTabs() {
+        manager = getSupportFragmentManager();
+
 
         viewPager = (ViewPager) findViewById(R.id.fragment_container);
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(manager);
 
         Log.d("initTabs","Adding Fragments");
         favFragId  = viewPagerAdapter.addFragment(new FavFragment(),getString(R.string.tab_favorites));
-        mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
+        if (getResources().getBoolean(R.bool.twoPaneMode)){ // tablet
+            Log.d("initTabs","Two-panes mode, including tablet");
+            mapFragment = new MapFragment();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.add(R.id.fragment_map,mapFragment,"mapFragment");
+            transaction.commit();
+        }
+        else {  //phone
+            Log.d("initTabs","Single-pane mode, i.e. Phone");
+            mapFragId = viewPagerAdapter.addFragment(new MapFragment(),getString(R.string.tab_map));
+        }
         searchFragId  = viewPagerAdapter.addFragment(new SearchFragment(),getString(R.string.tab_search));
 
 
-        Log.d("initTabs","Connecting the tabs to the Adapter");
+
+
+       // Log.d("initTabs","Connecting the tabs to the Adapter");
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(viewPagerAdapter);
 
-        Log.d("initTabs","Creating tabLayout");
+       // Log.d("initTabs","Creating tabLayout");
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.setSelectedTabIndicatorHeight(10);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.setupWithViewPager(viewPager);
 
-        Log.d("initTabs","Adding icons to the tab");
-        try{
+     //   Log.d("initTabs","Adding icons to the tab");
+        tabLayout.getTabAt(searchFragId).setIcon(android.R.drawable.ic_menu_directions);
+        tabLayout.getTabAt(favFragId).setIcon(android.R.drawable.ic_menu_myplaces);
+        if(mapFragment == null){
             tabLayout.getTabAt(mapFragId).setIcon(android.R.drawable.ic_dialog_map);
-            tabLayout.getTabAt(searchFragId).setIcon(android.R.drawable.ic_menu_directions);
-            tabLayout.getTabAt(favFragId).setIcon(android.R.drawable.ic_menu_myplaces);
-        } catch (Exception e){
-            Log.e("initTabs","Error adding icons. " + e.getMessage());
         }
     }
 
@@ -276,10 +296,14 @@ public class MainActivity extends AppCompatActivity
         Log.d("onLocChange","Got Location " + location.toString());
         currentLocation = location;
 
-        Fragment mapFrag = ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
-        if (mapFrag != null) {
+        if(getResources().getBoolean(R.bool.twoPaneMode)){
+            mapFragment = (MapFragment) manager.findFragmentByTag("mapFragment");
+        } else {
+            mapFragment = (MapFragment) ((ViewPagerAdapter) viewPager.getAdapter()).getItem(mapFragId);
+        }
+        if (mapFragment != null) {
             Log.d("onLocChanged","Updating the location in the map fragment");
-            ((MapFragment)mapFrag).setCurrentLocation(currentLocation);
+           mapFragment.setCurrentLocation(currentLocation);
         }
         SearchFragment searchFrag = (SearchFragment)((ViewPagerAdapter)viewPager.getAdapter()).getItem(searchFragId);
         if(searchFrag != null){
