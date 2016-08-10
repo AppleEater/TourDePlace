@@ -18,45 +18,49 @@
         android:theme="@style/AppTheme.AppBarOverlay"
         >
 
-  <android.support.v7.widget.Toolbar
-      android:layout_width="match_parent"
-      android:layout_height="?attr/actionBarSize"
-      android:id="@+id/toolbar"
-      android:minHeight="?attr/actionBarSize"
-      android:background="?attr/colorPrimary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-      app:layout_scrollFlags="scroll|enterAlways">
-  </android.support.v7.widget.Toolbar>
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/toolbar"
+            android:minHeight="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:layout_scrollFlags="scroll|enterAlways">
+        </android.support.v7.widget.Toolbar>
         <!--  app:popupTheme="@style/AppTheme.PopupOverlay" -->
 
 
         <android.support.design.widget.TabLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tabs"
-                app:tabMode="fixed"
-                app:tabGravity="fill" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tabs"
+            app:tabMode="fixed"
+            app:tabGravity="fill" />
 
 
-</android.support.design.widget.AppBarLayout>
+    </android.support.design.widget.AppBarLayout>
 
-<android.support.v4.view.ViewPager
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    android:id="@+id/fragment_container">
-</android.support.v4.view.ViewPager>
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:id="@+id/fragment_container">
+    </android.support.v4.view.ViewPager>
 
-<FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/settingsContainer"
-    android:layout_alignParentTop="true"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentLeft="true"
-    android:background="@android:color/transparent"
-    android:elevation="5dp"
-    >
-</FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/settingsContainer"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/transparent"
+        android:elevation="5dp"
+        >
+    </FrameLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
+    <fragment class="com.example.uaharoni.tourdeplace.view.MapFragment"
+        android:id="@+id/fragment_map"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"/>
+</android.support.design.widget.CoordinatorLayout>
